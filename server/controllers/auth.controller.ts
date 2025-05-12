@@ -2,6 +2,7 @@ import express from "express";
 import User from "../models/user.model";
 import bcryptjs, { compare } from "bcryptjs";
 import { Request, Response } from "express";
+import { generateToken } from "../lib/utils";
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -33,6 +34,7 @@ export const register = async (req: Request, res: Response) => {
     });
 
     if (newUser) {
+      generateToken(newUser._id, res);
       await newUser.save();
       const userObj = newUser.toObject();
       const { password: hidePass, ...userWithoutPassword } = userObj;
