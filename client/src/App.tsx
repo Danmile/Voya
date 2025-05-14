@@ -1,7 +1,11 @@
+import Navbar from "./components/Navbar";
+
 function App() {
   return (
     <>
-      <div className="flex justify-center h-full items-center">Voya app</div>
+      <div className="container">
+        <Navbar></Navbar>
+      </div>
     </>
   );
 }
