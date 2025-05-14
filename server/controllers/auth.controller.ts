@@ -4,6 +4,10 @@ import bcryptjs, { compare } from "bcryptjs";
 import { Request, Response } from "express";
 import { generateToken } from "../lib/utils";
 
+interface AuthenticatedRequest extends Request {
+  user?: any;
+}
+
 export const register = async (req: Request, res: Response) => {
   try {
     const { email, password, fullName } = req.body;
@@ -65,6 +69,7 @@ export const login = async (req: Request, res: Response) => {
     }
     const userObj = user.toObject();
     const { password: hidePass, ...userWithoutPassword } = userObj;
+    generateToken(user._id, res);
     res.status(200).send(userWithoutPassword);
   } catch (error) {
     res.status(500).json({ message: "Server Error" });
@@ -78,6 +83,15 @@ export const logout = async (req: Request, res: Response) => {
     res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
     console.log("Error in logout: ", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+export const checkAuth = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    res.status(200).send(req.user);
+  } catch (error) {
+    console.log("Error in checkAuth: ", error);
     res.status(500).json({ message: "Server Error" });
   }
 };
