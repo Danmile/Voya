@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { LogIn } from "lucide-react";
 import voyalogo from "../assets/voyaLogo.svg";
+import Button from "./Button";
 
 const Navbar = () => {
   return (
@@ -18,9 +19,13 @@ const Navbar = () => {
             <h1>Contact</h1>
           </Link>
         </div>
-
-        <Link to="/" className="block">
-          <LogIn />
+        <Link to="/login" className="block">
+          <span className="hidden sm:inline">
+            <Button>Sign in</Button>
+          </span>
+          <span className="inline sm:hidden">
+            <LogIn className="text-cyan-500/50 transition-colors hover:text-cyan-500" />
+          </span>
         </Link>
       </div>
     </div>
