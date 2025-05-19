@@ -2,13 +2,20 @@ import Navbar from "./components/Navbar";
 import { Route, Routes } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import Homepage from "./pages/Homepage";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
+import { Toaster } from "react-hot-toast";
+import { useAuthStore } from "./store/useAuthStore";
 
 interface ElementProps {
   children: ReactNode;
 }
 
 function App() {
+  const { checkAuth, authUser, isCheckingAuth } = useAuthStore();
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
   const WithNavBar = ({ children }: ElementProps) => (
     <>
       <Navbar />
@@ -27,8 +34,20 @@ function App() {
               </WithNavBar>
             }
           />
-          <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/login"
+            element={
+              authUser ? (
+                <WithNavBar>
+                  <Homepage />
+                </WithNavBar>
+              ) : (
+                <LoginPage />
+              )
+            }
+          />
         </Routes>
+        <Toaster position="top-center" reverseOrder={false} />
       </div>
     </>
   );
