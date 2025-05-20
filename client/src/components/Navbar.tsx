@@ -15,11 +15,14 @@ const Navbar = () => {
           <img src={voyalogo} alt="" width={40} height={50} />
         </Link>
         <div className="flex justify-center gap-5">
-          <Link to="/" className="block text-xl">
+          <Link to="/explore" className="block text-md md:text-lg lg:text-xl">
             <h1 className="">Explore</h1>
           </Link>
+          <Link to="/myTrips" className="block text-md md:text-lg lg:text-xl">
+            <h1 className="">My Trips</h1>
+          </Link>
 
-          <Link to="/" className="block text-xl">
+          <Link to="/contact" className="block text-md md:text-lg lg:text-xl">
             <h1>Contact</h1>
           </Link>
         </div>

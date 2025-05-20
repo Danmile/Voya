@@ -1,17 +1,18 @@
 import Navbar from "./components/Navbar";
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import Homepage from "./pages/Homepage";
 import { useEffect, type ReactNode } from "react";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/useAuthStore";
+import RegisterPage from "./pages/Registerpage";
 
 interface ElementProps {
   children: ReactNode;
 }
 
 function App() {
-  const { checkAuth, authUser, isCheckingAuth } = useAuthStore();
+  const { checkAuth, authUser } = useAuthStore();
 
   useEffect(() => {
     checkAuth();
@@ -34,7 +35,14 @@ function App() {
               </WithNavBar>
             }
           />
-          <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/login"
+            element={!authUser ? <LoginPage /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/register"
+            element={!authUser ? <RegisterPage /> : <Navigate to="/" />}
+          />
         </Routes>
         <Toaster position="top-center" reverseOrder={false} />
       </div>

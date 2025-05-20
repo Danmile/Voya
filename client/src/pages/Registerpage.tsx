@@ -4,17 +4,18 @@ import voyaLogo from "../assets/voyaLogo.svg";
 import { useAuthStore } from "../store/useAuthStore";
 import { useState } from "react";
 
-const LoginPage = () => {
-  const { login } = useAuthStore();
+const RegisterPage = () => {
+  const { register } = useAuthStore();
 
   const [formData, setFormData] = useState({
     email: "",
     password: "",
+    fullName: "",
   });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await login(formData);
+    await register(formData);
   };
 
   return (
@@ -27,14 +28,23 @@ const LoginPage = () => {
         />
       </div>
       <div className="flex flex-col items-center justify-center mt-40 gap-10 z-1 px-6 lg:gap-15 lg:w-1/2 lg:mt-20">
-        <h1 className="font-bold text-4xl text-cyan-600">Login</h1>
-        <p className="text-center text-xl text-gray-600 -mt-5">
-          Welcome back you've
+        <h1 className="font-bold text-4xl text-cyan-600">Register</h1>
+        <p className="text-center text-xl text-gray-600 -mt-5">Just a couple</p>
+        <p className="text-center text-xl text-gray-600 -mt-12">
+          of details to begin
         </p>
-        <p className="text-center text-xl text-gray-600 -mt-12">been missed!</p>
 
         <form onSubmit={handleSubmit} className="w-full max-w-md">
           <div className="flex flex-col gap-8">
+            <input
+              className="bg-cyan-100/80 rounded-md w-full h-15 focus:border-2 outline-none focus:border-cyan-600 text-md font-semibold pl-3"
+              type="fullName"
+              placeholder="Full name"
+              value={formData.fullName}
+              onChange={(e) =>
+                setFormData({ ...formData, fullName: e.target.value })
+              }
+            />
             <input
               className="bg-cyan-100/80 rounded-md w-full h-15 focus:border-2 outline-none focus:border-cyan-600 text-md font-semibold pl-3"
               type="email"
@@ -53,20 +63,14 @@ const LoginPage = () => {
                 setFormData({ ...formData, password: e.target.value })
               }
             />
-            <Link className="text-xs text-cyan-600 font-bold flex justify-end md:text-lg">
-              Forgot your password?
-            </Link>
             <button
               type="submit"
               className="bg-cyan-600 text-white font-bold rounded-md h-15 hover:bg-cyan-700 transition shadow-md shadow-cyan-700/50"
             >
               Sign In
             </button>
-            <Link
-              to="/register"
-              className="text-sm text-gray-700 font-bold flex justify-center md:text-lg"
-            >
-              Create a new account
+            <Link className="text-sm text-gray-700 font-bold flex justify-center md:text-lg">
+              Flashbacks of current accout?
             </Link>
           </div>
         </form>
@@ -93,4 +97,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default RegisterPage;

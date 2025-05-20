@@ -9,6 +9,7 @@ interface AuthState {
   login: (data: any) => Promise<void>;
   checkAuth: () => Promise<void>;
   logout: () => Promise<void>;
+  register: (data: any) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -50,6 +51,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       toast.success("Signed out successfully");
     } catch (error) {
       console.error("Error in logout:", error);
+    }
+  },
+  register: async (data) => {
+    try {
+      const res = await axiosInstance.post("/auth/register", data);
+      set({ authUser: res.data });
+      toast.success("Account created successfully");
+    } catch (error) {
+      console.error("Error in register store: ", error);
     }
   },
 }));
