@@ -34,18 +34,7 @@ function App() {
               </WithNavBar>
             }
           />
-          <Route
-            path="/login"
-            element={
-              authUser ? (
-                <WithNavBar>
-                  <Homepage />
-                </WithNavBar>
-              ) : (
-                <LoginPage />
-              )
-            }
-          />
+          <Route path="/login" element={<LoginPage />} />
         </Routes>
         <Toaster position="top-center" reverseOrder={false} />
       </div>

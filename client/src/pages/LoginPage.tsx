@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import bg2 from "../assets/bg2.svg";
 import voyaLogo from "../assets/voyaLogo.svg";
 import { useAuthStore } from "../store/useAuthStore";
@@ -6,6 +6,8 @@ import { useState } from "react";
 
 const LoginPage = () => {
   const { login } = useAuthStore();
+  const authUser = useAuthStore((state) => state.authUser);
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -14,7 +16,10 @@ const LoginPage = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    login(formData);
+    await login(formData);
+    if (authUser) {
+      navigate("/");
+    }
   };
 
   return (
