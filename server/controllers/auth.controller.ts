@@ -3,6 +3,8 @@ import User from "../models/user.model";
 import bcryptjs, { compare } from "bcryptjs";
 import { Request, Response } from "express";
 import { generateToken } from "../lib/utils";
+import crypto from "crypto";
+import nodemailer from "nodemailer";
 
 interface AuthenticatedRequest extends Request {
   user?: any;
@@ -94,4 +96,58 @@ export const checkAuth = async (req: AuthenticatedRequest, res: Response) => {
     console.log("Error in checkAuth: ", error);
     res.status(500).json({ message: "Server Error" });
   }
+};
+
+export const forgotPasswordRoute = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      res.status(400).json({ message: "Email is required" });
+      return;
+    }
+    const user = await User.findOne({ email });
+    if (!user) {
+      res.status(400).json({ message: "Invalid email" });
+      return;
+    }
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: { user: "danmil511@gmail.com", pass: "jzsz imjc oeba gfin" },
+    });
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    user.resetToken = resetToken;
+    user.resetTokenExpiry = new Date(Date.now() + 3600000); // 1 hour;
+    await user.save();
+
+    const resetLink = `http://localhost:5173/reset-password/${resetToken}`;
+
+    const mailOptions = {
+      from: "danmil511@gmail.com",
+      to: user.email,
+      subject: "Voya - reset your password",
+      html: `<p>Click <a href="${resetLink}">here</a> to reset your password. The link expires in 1 hour.</p>`,
+    };
+    await transporter.sendMail(mailOptions);
+    res.status(200).json({ message: "Password reset email sent" });
+
+    res.status(200).json({ user });
+  } catch (error) {}
+};
+
+export const resetPassword = async (req: Request, res: Response) => {
+  const { resetToken } = req.params;
+  const { password } = req.body;
+  const user = await User.findOne({ resetToken });
+  if (!user) {
+    res.status(400).json({ message: "Expired session" });
+    return;
+  }
+  const salt = await bcryptjs.genSalt(10);
+  user.password = await bcryptjs.hash(password, salt);
+  user.resetToken = undefined;
+  user.resetTokenExpiry = undefined;
+
+  generateToken(user._id, res);
+  await user.save();
+  res.status(200).json(user);
 };
