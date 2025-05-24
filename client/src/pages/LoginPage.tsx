@@ -53,7 +53,10 @@ const LoginPage = () => {
                 setFormData({ ...formData, password: e.target.value })
               }
             />
-            <Link className="text-xs text-cyan-600 font-bold flex justify-end md:text-lg">
+            <Link
+              to="/forgot-password"
+              className="text-xs text-cyan-600 font-bold flex justify-end md:text-lg"
+            >
               Forgot your password?
             </Link>
             <button

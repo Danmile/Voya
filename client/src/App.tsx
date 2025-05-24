@@ -2,6 +2,7 @@ import Navbar from "./components/Navbar";
 import { Navigate, Route, Routes } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import Homepage from "./pages/Homepage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import { useEffect, type ReactNode } from "react";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/useAuthStore";
@@ -42,6 +43,10 @@ function App() {
           <Route
             path="/register"
             element={!authUser ? <RegisterPage /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/forgot-password"
+            element={!authUser ? <ForgotPasswordPage /> : <Navigate to="/" />}
           />
         </Routes>
         <Toaster position="top-center" reverseOrder={false} />
