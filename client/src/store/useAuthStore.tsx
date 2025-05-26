@@ -11,6 +11,7 @@ interface AuthState {
   logout: () => Promise<void>;
   register: (data: any) => Promise<void>;
   forgotPassword: (data: any) => Promise<void>;
+  resetPassword: (data: any, resetToken: string | undefined) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -67,6 +68,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       const res = await axiosInstance.post("auth/forgot-password", data);
       toast.success(res.data.message);
+    } catch (error: any) {
+      toast.error(error.response.data.message);
+    }
+  },
+  resetPassword: async (data, resetToken) => {
+    try {
+      const res = await axiosInstance.post(
+        `/auth/reset-password/${resetToken}`,
+        data
+      );
+      set({ authUser: res.data });
+      toast.success("Password changed successfully");
     } catch (error: any) {
       toast.error(error.response.data.message);
     }

@@ -7,6 +7,7 @@ import { useEffect, type ReactNode } from "react";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/useAuthStore";
 import RegisterPage from "./pages/Registerpage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 interface ElementProps {
   children: ReactNode;
@@ -47,6 +48,10 @@ function App() {
           <Route
             path="/forgot-password"
             element={!authUser ? <ForgotPasswordPage /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/reset-password/:resetToken"
+            element={!authUser ? <ResetPasswordPage /> : <Navigate to="/" />}
           />
         </Routes>
         <Toaster position="top-center" reverseOrder={false} />

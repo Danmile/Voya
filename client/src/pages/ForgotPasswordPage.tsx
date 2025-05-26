@@ -8,7 +8,6 @@ const ForgotPasswordPage = () => {
 
   const handleEmail = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(email);
     await forgotPassword(email);
   };
   return (
@@ -38,6 +37,7 @@ const ForgotPasswordPage = () => {
               type="email"
               placeholder="Email"
               onChange={(e) => setEmail({ email: e.target.value })}
+              required
             />
             <button
               type="submit"
