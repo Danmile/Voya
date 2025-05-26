@@ -1,6 +1,16 @@
+import { useState } from "react";
 import bg2 from "../assets/bg2.svg";
+import { useAuthStore } from "../store/useAuthStore";
 
 const ForgotPasswordPage = () => {
+  const { forgotPassword } = useAuthStore();
+  const [email, setEmail] = useState({ email: "" });
+
+  const handleEmail = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.log(email);
+    await forgotPassword(email);
+  };
   return (
     <div className="h-screen w-screen flex flex-col justify-center items-center">
       <div className="absolute top-0 h-screen w-screen bg-gradient-to-r from-white to-cyan-700">
@@ -21,12 +31,13 @@ const ForgotPasswordPage = () => {
           address below.
         </p>
 
-        <form className="w-full max-w-md">
+        <form className="w-full max-w-md" onSubmit={(e) => handleEmail(e)}>
           <div className="flex flex-col gap-10">
             <input
               className="bg-cyan-100/80 rounded-md w-full h-15 focus:border-2 outline-none focus:border-cyan-600 text-md font-semibold pl-3"
               type="email"
               placeholder="Email"
+              onChange={(e) => setEmail({ email: e.target.value })}
             />
             <button
               type="submit"

@@ -10,6 +10,7 @@ interface AuthState {
   checkAuth: () => Promise<void>;
   logout: () => Promise<void>;
   register: (data: any) => Promise<void>;
+  forgotPassword: (data: any) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -60,6 +61,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       toast.success("Account created successfully");
     } catch (error) {
       console.error("Error in register store: ", error);
+    }
+  },
+  forgotPassword: async (data) => {
+    try {
+      const res = await axiosInstance.post("auth/forgot-password", data);
+      toast.success(res.data.message);
+    } catch (error: any) {
+      toast.error(error.response.data.message);
     }
   },
 }));
