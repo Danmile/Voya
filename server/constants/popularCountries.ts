@@ -8,14 +8,6 @@ interface Country {
 
 export const popularCountries: Country[] = [
   {
-    name: "United States",
-    code: "US",
-    lat: 37.0902,
-    lon: -95.7129,
-    imageUrl:
-      "https://images.pexels.com/photos/290386/pexels-photo-290386.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
-  },
-  {
     name: "France",
     code: "FR",
     lat: 46.2276,
@@ -400,27 +392,3 @@ export const popularCountries: Country[] = [
       "https://images.pexels.com/photos/2587789/pexels-photo-2587789.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
   },
 ];
-// const fetchCountryImages = async (): Promise<Country[]> => {
-//   for (let country of popularCountries) {
-//     try {
-//       const res = await fetch(
-//         `https://api.pexels.com/v1/search?query=${encodeURIComponent(
-//           country.name
-//         )}&per_page=1`,
-//         {
-//           headers: {
-//             Authorization:
-//               "1kw1O97yPCaIOX8RZYLomnffy4yaNlCRT1PWff3BOZcTlD6Sa6nYnf0U",
-//           },
-//         }
-//       );
-//       const data = await res.json();
-//       const image = data.photos?.[0];
-//       country.imageUrl = image ? image.src.landscape : undefined;
-//     } catch (error) {
-//       console.error(`Failed to fetch image for ${country.name}`, error);
-//       country.imageUrl = undefined;
-//     }
-//   }
-//   return popularCountries;
-// };

@@ -12,6 +12,62 @@ interface AuthenticatedRequest extends Request {
   user?: any;
 }
 
+interface City {
+  name: string;
+  lat: number;
+  lon: number;
+}
+
+const fetchImages = async (popularCities: any): Promise<City[]> => {
+  for (let city of popularCities) {
+    try {
+      const response = await axios.get(
+        `https://api.pexels.com/v1/search?query=${city.name}&per_page=1`,
+
+        {
+          headers: {
+            Authorization: process.env.PEXELS_API_KEY,
+          },
+        }
+      );
+
+      const image = response.data.photos?.[0];
+
+      city.imageUrl = image ? image.src.landscape : undefined;
+    } catch (error) {
+      console.error(`Failed to fetch image for ${city.name}`, error);
+
+      city.imageUrl = undefined;
+    }
+  }
+
+  return popularCities;
+  // const imagePromises = popularCities.map(async (city: any) => {
+  //   try {
+  //     const response = await axios.get(
+  //       `https://api.pexels.com/v1/search?query=${encodeURIComponent(
+  //         city.name
+  //       )}&per_page=1`,
+  //       {
+  //         headers: {
+  //           Authorization: process.env.PEXELS_API_KEY,
+  //         },
+  //       }
+  //     );
+  //     const image = response.data.photos?.[0];
+  //     city.imageUrl = image ? image.src.landscape : undefined;
+  //   } catch (error) {
+  //     console.error(`Failed to fetch image for ${city.name}:`, error);
+  //     city.imageUrl = undefined;
+  //   }
+  //   return city;
+  // });
+
+  // await Promise.all(imagePromises);
+
+  // return popularCities;
+};
+
 export const register = async (req: Request, res: Response) => {
   try {
     const { email, password, fullName } = req.body;
@@ -185,7 +241,7 @@ export const attractions = async (
       "https://api.geoapify.com/v2/places",
       {
         params: {
-          categories: "tourism.attraction",
+          categories: "tourism",
           filter: `circle:${lon},${lat},5000`,
           limit: 20,
           apiKey,
@@ -202,4 +258,35 @@ export const attractions = async (
 
 export const countries = (req: Request, res: Response) => {
   res.json(popularCountries);
+};
+
+export const getCities = async (req: Request, res: Response) => {
+  const { country } = req.query;
+  try {
+    const response = await axios.get("https://google.serper.dev/places", {
+      params: {
+        q: `top+cities+to+visit+in+${country}`,
+      },
+      headers: {
+        "X-API-KEY": process.env.SERPER_API_KEY,
+        "Content-Type": "application/json",
+      },
+    });
+    const topCities = response.data.places;
+
+    if (!topCities && topCities.length === 0) {
+      res.status(404).json({ message: `There is no cities in this region` });
+    }
+    const extractedCityData = topCities.map((place: any) => ({
+      name: place.title,
+      latitude: place.latitude,
+      longitude: place.longitude,
+    }));
+
+    const citiesWithImages = await fetchImages(extractedCityData);
+    res.json(citiesWithImages);
+  } catch (error: any) {
+    console.error("Error fetching cities:", error.message);
+    res.status(500).json({ message: "Server Error" });
+  }
 };
