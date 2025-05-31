@@ -5,6 +5,8 @@ import { Request, Response } from "express";
 import { generateToken } from "../lib/utils";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
+import { popularCountries } from "../constants/popularCountries";
+import axios from "axios";
 
 interface AuthenticatedRequest extends Request {
   user?: any;
@@ -150,4 +152,54 @@ export const resetPassword = async (req: Request, res: Response) => {
   generateToken(user._id, res);
   await user.save();
   res.status(200).json(user);
+};
+
+export const attractions = async (
+  req: Request<{}, {}, {}, { destination?: string }>,
+  res: Response
+): Promise<void> => {
+  const { destination } = req.query;
+  const apiKey = process.env.GEOAPIFY_API_KEY;
+
+  if (!destination) {
+    res.status(400).json({ error: "Destination query parameter is required" });
+    return;
+  }
+
+  try {
+    const geocodeResponse = await axios.get(
+      "https://api.geoapify.com/v1/geocode/search",
+      {
+        params: { text: destination, apiKey },
+      }
+    );
+
+    if (!geocodeResponse.data.features.length) {
+      res.status(404).json({ error: "City not found" });
+      return;
+    }
+
+    const { lat, lon } = geocodeResponse.data.features[0].properties;
+
+    const attractionsResponse = await axios.get(
+      "https://api.geoapify.com/v2/places",
+      {
+        params: {
+          categories: "tourism.attraction",
+          filter: `circle:${lon},${lat},5000`,
+          limit: 20,
+          apiKey,
+        },
+      }
+    );
+
+    res.json(attractionsResponse.data.features);
+  } catch (error: any) {
+    console.error("Error fetching attractions:", error.message);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+export const countries = (req: Request, res: Response) => {
+  res.json(popularCountries);
 };
