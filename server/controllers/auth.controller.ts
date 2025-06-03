@@ -7,6 +7,7 @@ import crypto from "crypto";
 import nodemailer from "nodemailer";
 import { popularCountries } from "../constants/popularCountries";
 import axios from "axios";
+import { features } from "process";
 
 interface AuthenticatedRequest extends Request {
   user?: any;
@@ -42,30 +43,6 @@ const fetchImages = async (popularCities: any): Promise<City[]> => {
   }
 
   return popularCities;
-  // const imagePromises = popularCities.map(async (city: any) => {
-  //   try {
-  //     const response = await axios.get(
-  //       `https://api.pexels.com/v1/search?query=${encodeURIComponent(
-  //         city.name
-  //       )}&per_page=1`,
-  //       {
-  //         headers: {
-  //           Authorization: process.env.PEXELS_API_KEY,
-  //         },
-  //       }
-  //     );
-  //     const image = response.data.photos?.[0];
-  //     city.imageUrl = image ? image.src.landscape : undefined;
-  //   } catch (error) {
-  //     console.error(`Failed to fetch image for ${city.name}:`, error);
-  //     city.imageUrl = undefined;
-  //   }
-  //   return city;
-  // });
-
-  // await Promise.all(imagePromises);
-
-  // return popularCities;
 };
 
 export const register = async (req: Request, res: Response) => {
@@ -249,7 +226,26 @@ export const attractions = async (
       }
     );
 
-    res.json(attractionsResponse.data.features);
+    if (!attractionsResponse.data.features) {
+      res.json([]);
+    }
+    const formattedAttractions = attractionsResponse.data.features.map(
+      (att: any) => {
+        return {
+          placeId: att.properties.place_id,
+          name: att.properties.name_international?.en || att.properties.name,
+          website: att.properties.website,
+          state: att.properties.state,
+          lon: att.properties.lon,
+          lat: att.properties.lat,
+          address: att.properties.formatted,
+          opening_hours: att.properties.opening_hours,
+          categories: att.properties.categories,
+        };
+      }
+    );
+
+    res.json(formattedAttractions);
   } catch (error: any) {
     console.error("Error fetching attractions:", error.message);
     res.status(500).json({ message: "Server Error" });
