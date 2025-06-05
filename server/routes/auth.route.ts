@@ -6,9 +6,6 @@ import {
   checkAuth,
   forgotPasswordRoute,
   resetPassword,
-  countries,
-  attractions,
-  getCities,
 } from "../controllers/auth.controller";
 import { protectRoute } from "../middleware/auth.middleware";
 
@@ -20,9 +17,5 @@ router.post("/logout", logout);
 router.get("/check", protectRoute, checkAuth);
 router.post("/forgot-password", forgotPasswordRoute);
 router.post("/reset-password/:resetToken", resetPassword);
-// Attraction routes
-router.get("/countries", countries);
-router.get("/cities", getCities);
-router.get("/attractions", attractions);
 
 export default router;

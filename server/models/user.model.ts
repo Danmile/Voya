@@ -22,6 +22,12 @@ const userSchema = new mongoose.Schema(
     resetTokenExpiry: {
       type: Date,
     },
+    favoriteAttractions: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Attraction",
+      },
+    ],
   },
   { timestamps: true }
 );

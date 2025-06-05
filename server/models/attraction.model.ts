@@ -6,8 +6,6 @@ const attractionSchema = new mongoose.Schema({
     unique: true,
   },
   image: { type: String, required: true },
-  description: { type: String, required: true },
-  rating: { type: Number, required: true },
   name: {
     type: String,
     required: true,
@@ -28,7 +26,7 @@ const attractionSchema = new mongoose.Schema({
     required: true,
   },
   address: {
-    type: Number,
+    type: String,
     required: true,
   },
   opening_hours: {
@@ -36,7 +34,7 @@ const attractionSchema = new mongoose.Schema({
     required: false,
   },
   categories: {
-    type: String,
+    type: Object,
     required: true,
   },
 });
