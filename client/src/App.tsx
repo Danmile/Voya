@@ -22,12 +22,12 @@ function App() {
   const WithNavBar = ({ children }: ElementProps) => (
     <>
       <Navbar />
-      <div className="container pt-20">{children}</div>
+      <>{children}</>
     </>
   );
   return (
     <>
-      <div className="container">
+      <>
         <Routes>
           <Route
             path="/"
@@ -55,7 +55,7 @@ function App() {
           />
         </Routes>
         <Toaster position="top-center" reverseOrder={false} />
-      </div>
+      </>
     </>
   );
 }
