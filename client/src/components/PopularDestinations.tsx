@@ -21,14 +21,14 @@ const PopularDestinations = () => {
     <div className="relative w-full px-4 md:flex md:flex-col md:justify-center md:items-center">
       <button
         onClick={scrollLeft}
-        className="hidden md:block md:absolute left-0 top-1/2 z-10 bg-white p-2 shadow rounded"
+        className="hidden md:block md:absolute left-[1%] top-1/2 z-10 bg-gray-200 p-2 shadow rounded"
       >
         ←
       </button>
       <h1 className="text-4xl font-bold text-center mt-10">Where to next?</h1>
       <div
         ref={scrollRef}
-        className="w-full flex snap-x snap-mandatory overflow-x-auto my-10 scrollbar-hide"
+        className="w-full flex snap-x snap-mandatory overflow-x-auto my-10 scrollbar-hide max-w-[100rem]"
       >
         {popularCountries.map((country) => (
           <div
@@ -48,7 +48,7 @@ const PopularDestinations = () => {
       </div>
       <button
         onClick={scrollRight}
-        className="hidden md:block md:absolute right-0 top-1/2 z-10 bg-white p-2 shadow rounded"
+        className="hidden md:block md:absolute right-[1%] top-1/2 z-10 bg-gray-200 p-2 shadow rounded"
       >
         →
       </button>
