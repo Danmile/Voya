@@ -1,7 +1,6 @@
 import User from "../models/user.model";
 import Attraction from "../models/attraction.model";
 import { Request, Response } from "express";
-import { popularCountries } from "../constants/popularCountries";
 import axios from "axios";
 
 interface City {
@@ -129,10 +128,6 @@ export const favoriteAttraction = async (req: Request, res: Response) => {
     console.error("Error fetching favorite attractions:", error.message);
     res.status(500).json({ message: "Server Error" });
   }
-};
-
-export const countries = (req: Request, res: Response) => {
-  res.json(popularCountries);
 };
 
 export const getCities = async (req: Request, res: Response) => {
