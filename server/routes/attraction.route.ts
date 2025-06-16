@@ -1,8 +1,9 @@
 import express from "express";
 import {
   attractions,
-  getCities,
+  getTopCities,
   favoriteAttraction,
+  getCities,
 } from "../controllers/attraction.controller";
 import { protectRoute } from "../middleware/auth.middleware";
 
@@ -10,6 +11,7 @@ const router = express.Router();
 
 // Attraction routes
 router.get("/cities", getCities);
+router.get("/topcities", getTopCities);
 router.get("/attractions", attractions);
 router.post("/user/attractions", protectRoute, favoriteAttraction);
 

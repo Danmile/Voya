@@ -131,6 +131,25 @@ export const favoriteAttraction = async (req: Request, res: Response) => {
 };
 
 export const getCities = async (req: Request, res: Response) => {
+  const { city } = req.query;
+  try {
+    const response = await axios.get("https://api.api-ninjas.com/v1/city", {
+      params: {
+        name: city,
+      },
+      headers: {
+        "X-Api-Key": process.env.NINJA_API_KEY,
+      },
+    });
+    const cities = response.data;
+    if (!cities) {
+      res.status(404).json({ message: "Invalid city" });
+    }
+    res.status(200).json(cities);
+  } catch (error) {}
+};
+
+export const getTopCities = async (req: Request, res: Response) => {
   const { country } = req.query;
   try {
     const response = await axios.get("https://google.serper.dev/places", {
