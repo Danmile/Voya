@@ -1,3 +1,4 @@
+import ExploreComponent from "../components/ExploreComponent";
 import HeroComponent from "../components/HeroComponent";
 import PopularDestinations from "../components/PopularDestinations";
 
@@ -6,6 +7,7 @@ const Homepage = () => {
     <>
       <HeroComponent />
       <PopularDestinations />
+      <ExploreComponent />
     </>
   );
 };
