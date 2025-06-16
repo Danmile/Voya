@@ -1,4 +1,3 @@
-import Button from "./Button";
 import SearchBar from "./SearchBar";
 
 const HeroComponent = () => {
