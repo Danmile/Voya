@@ -1,24 +1,28 @@
-import mongoose from "mongoose";
+import mongoose, { Schema, Document, Types } from "mongoose";
 
-const attractionSchema = new mongoose.Schema({
-  placeId: {
+export interface IAttraction extends Document {
+  image: string;
+  name: string;
+  lon: number;
+  lat: number;
+  address: string;
+  description: string;
+  wikiTitle: string;
+  cityName: string;
+  city: Types.ObjectId;
+}
+
+const attractionSchema = new Schema<IAttraction>({
+  image: {
     type: String,
-    unique: true,
+    required: true,
   },
-  image: { type: String, required: true },
   name: {
     type: String,
     required: true,
   },
-  website: {
-    type: String,
-  },
-  state: {
-    type: String,
-    required: true,
-  },
   lon: {
-    type: String,
+    type: Number,
     required: true,
   },
   lat: {
@@ -29,16 +33,25 @@ const attractionSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  opening_hours: {
-    type: mongoose.Schema.Types.Mixed,
-    required: false,
+  description: {
+    type: String,
+    required: true,
   },
-  categories: {
-    type: Object,
+  wikiTitle: {
+    type: String,
+    required: true,
+  },
+  cityName: {
+    type: String,
+    required: true,
+  },
+  city: {
+    type: Schema.Types.ObjectId,
+    ref: "City",
     required: true,
   },
 });
 
-const Attraction = mongoose.model("Attraction", attractionSchema);
+const Attraction = mongoose.model<IAttraction>("Attraction", attractionSchema);
 
 export default Attraction;

@@ -42,6 +42,37 @@ const fetchImages = async (popularCities: City[]): Promise<City[]> => {
   return citiesWithImages;
 };
 
+const fetchWikimediaImage = async (
+  commonsCategory: string
+): Promise<string | null> => {
+  const category = commonsCategory.replace("Category:", "");
+
+  try {
+    const res = await axios.get("https://commons.wikimedia.org/w/api.php", {
+      params: {
+        action: "query",
+        format: "json",
+        generator: "categorymembers",
+        gcmtitle: `Category:${category}`,
+        gcmtype: "file",
+        gcmlimit: 1,
+        prop: "imageinfo",
+        iiprop: "url",
+        origin: "*", // Required for CORS in browser
+      },
+    });
+
+    const pages = res.data?.query?.pages;
+    if (!pages) return null;
+
+    const firstPage = Object.values(pages)[0] as any;
+    return firstPage?.imageinfo?.[0]?.url || null;
+  } catch (err) {
+    console.error("Error fetching Wikimedia image for:", commonsCategory);
+    return null;
+  }
+};
+
 export const attractions = async (
   req: Request<{}, {}, {}, { destination?: string }>,
   res: Response
@@ -58,7 +89,7 @@ export const attractions = async (
     const geocodeResponse = await axios.get(
       "https://api.geoapify.com/v1/geocode/search",
       {
-        params: { text: destination, apiKey },
+        params: { text: destination, apiKey, limit: 1 },
       }
     );
 
@@ -74,7 +105,9 @@ export const attractions = async (
       {
         params: {
           categories: "tourism",
-          filter: `circle:${lon},${lat},5000`,
+          filter: `circle:${lon},${lat},3000`,
+          fields:
+            "place_id,name,wiki_and_media,website,state,lon,lat,formatted,opening_hours,categories",
           limit: 20,
           apiKey,
         },
@@ -84,23 +117,32 @@ export const attractions = async (
     if (!attractionsResponse.data.features) {
       res.json([]);
     }
-    const formattedAttractions = attractionsResponse.data.features.map(
-      (att: any) => {
-        return {
-          placeId: att.properties.place_id,
-          name: att.properties.name_international?.en || att.properties.name,
-          image:
-            att.properties.wiki_and_media?.image ||
-            att.properties.datasource?.raw?.image,
-          website: att.properties.website,
-          state: att.properties.state,
-          lon: att.properties.lon,
-          lat: att.properties.lat,
-          address: att.properties.formatted,
-          opening_hours: att.properties.opening_hours,
-          categories: att.properties.categories,
-        };
-      }
+    const formattedAttractions = await Promise.all(
+      attractionsResponse.data.features
+        .filter(
+          (att: any) =>
+            (att.properties.name_international?.en || att.properties.name) &&
+            att.properties.wiki_and_media?.wikimedia_commons
+        )
+        .map(async (att: any) => {
+          const wikiCommons = att.properties.wiki_and_media?.wikimedia_commons;
+          const image = wikiCommons
+            ? await fetchWikimediaImage(wikiCommons)
+            : null;
+
+          return {
+            placeId: att.properties.place_id,
+            name: att.properties.name_international?.en || att.properties.name,
+            image,
+            website: att.properties.website,
+            state: att.properties.state,
+            lon: att.properties.lon,
+            lat: att.properties.lat,
+            address: att.properties.formatted,
+            opening_hours: att.properties.opening_hours,
+            categories: att.properties.categories,
+          };
+        })
     );
 
     res.json(formattedAttractions);
