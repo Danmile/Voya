@@ -8,6 +8,7 @@ import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/useAuthStore";
 import RegisterPage from "./pages/Registerpage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import AttractionsPage from "./pages/AttractionsPage";
 
 interface ElementProps {
   children: ReactNode;
@@ -52,6 +53,14 @@ function App() {
           <Route
             path="/reset-password/:resetToken"
             element={!authUser ? <ResetPasswordPage /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/attractions/:cityName"
+            element={
+              <WithNavBar>
+                <AttractionsPage />
+              </WithNavBar>
+            }
           />
         </Routes>
         <Toaster position="top-center" reverseOrder={false} />

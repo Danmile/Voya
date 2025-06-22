@@ -1,16 +1,30 @@
 import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAttractionStore } from "../store/useAttractionStore";
+import { Link } from "react-router-dom";
 
 const SearchBar = () => {
   const [destination, setDestination] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
+  const [isCitySelected, setIsCitySelected] = useState(false);
 
   const { cities, getCities } = useAttractionStore();
 
   const handleSelect = async (cityName: string) => {
     setDestination(cityName);
     setShowDropdown(false);
+    setIsCitySelected(true);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setDestination(value);
+    setShowDropdown(!!value.trim());
+    // Only allow navigation if input matches a city exactly
+    const isValidCity = cities?.some(
+      (city) => city.name.toLowerCase() === value.trim().toLowerCase()
+    );
+    setIsCitySelected(isValidCity || false);
   };
 
   useEffect(() => {
@@ -19,9 +33,8 @@ const SearchBar = () => {
     const timeout = setTimeout(() => {
       getCities(destination);
     }, 300);
-
     return () => clearTimeout(timeout);
-  }, [destination]);
+  }, [destination, getCities]);
 
   return (
     <div className="bg-white rounded-4xl w-full mx-auto font-semibold drop-shadow-xl">
@@ -38,12 +51,7 @@ const SearchBar = () => {
             <input
               type="text"
               value={destination}
-              onChange={(e) => {
-                const value = e.target.value;
-                setDestination(value);
-                setShowDropdown(true);
-                if (!value.trim()) setShowDropdown(false);
-              }}
+              onChange={handleInputChange}
               className="text-sm rounded w-full focus:outline-none focus:ring-0"
               placeholder="Search your destination"
             />
@@ -85,14 +93,27 @@ const SearchBar = () => {
             />
           </div>
         </div>
-        <button className="bg-blue-500 rounded-4xl p-1 flex items-center justify-center gap-1 cursor-pointer lg:p-3">
+        <Link
+          to={
+            isCitySelected &&
+            destination.trim() &&
+            destination === cities?.[0].name
+              ? `/attractions/${encodeURIComponent(destination)}`
+              : "#"
+          }
+          className={`flex items-center justify-center gap-2 p-3 rounded-4xl ${
+            isCitySelected && destination.trim()
+              ? "bg-blue-500 hover:bg-blue-600"
+              : "bg-gray-400"
+          } transition`}
+        >
           <h1 className="hidden lg:block rounded-4xl text-white font-normal mx-2">
             Find my adventure
           </h1>
           <div className="lg:bg-white rounded-4xl p-2.5 text-white lg:text-black">
             <Search />
           </div>
-        </button>
+        </Link>
       </form>
     </div>
   );
