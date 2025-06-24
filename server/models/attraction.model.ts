@@ -10,6 +10,7 @@ export interface IAttraction extends Document {
   wikiTitle: string;
   cityName: string;
   city: Types.ObjectId;
+  price: number;
 }
 
 const attractionSchema = new Schema<IAttraction>({
@@ -49,6 +50,11 @@ const attractionSchema = new Schema<IAttraction>({
     type: Schema.Types.ObjectId,
     ref: "City",
     required: true,
+  },
+  price: {
+    type: Number,
+    required: true,
+    min: 0,
   },
 });
 
