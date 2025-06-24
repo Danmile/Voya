@@ -76,7 +76,7 @@ const SearchBar = () => {
           <div className="hidden lg:flex justify-center items-center bg-violet-100 rounded-4xl p-4">
             <img src="/src/assets/date.png" alt="" width={150} />
           </div>
-          <div className="hidden lg:flex flex-col w-full">
+          <div className="hidden lg:flex flex-col w-full p-3">
             <h1 className="mb-1">Date</h1>
             <DatePicker
               selectsRange
@@ -87,7 +87,7 @@ const SearchBar = () => {
               }
               isClearable
               placeholderText="Select a date range"
-              className="text-xs rounded w-full focus:outline-none focus:ring-0 mr-6 py-2 px-2 border border-gray-300"
+              className="text-sm rounded w-full focus:outline-none focus:ring-0"
             />
           </div>
           <div className="hidden lg:flex justify-center items-center bg-green-100 rounded-4xl p-4">

@@ -29,20 +29,27 @@ const Navbar = () => {
         {!authUser ? (
           <Link to="/login" className="block">
             <span className="hidden sm:inline">
-              <Button>Sign in</Button>
+              <button className="text-black text-xs rounded-xl p-3 border-gray-400 border cursor-pointer text-center font-medium md:text-sm hover:border-gray-700">
+                Sign in
+              </button>
             </span>
             <span className="inline sm:hidden">
-              <LogIn className="text-cyan-500/50 transition-colors hover:text-cyan-500" />
+              <LogIn className="text-gray-700/50 transition-colors hover:text-gray-500" />
             </span>
           </Link>
         ) : (
           <div className="block">
             {" "}
             <span className="hidden sm:inline">
-              <Button onClick={() => logout()}>Sign out</Button>
+              <button
+                className="text-black text-xs rounded-xl p-3 border-gray-400 border cursor-pointer text-center font-medium md:text-sm hover:border-gray-700"
+                onClick={() => logout()}
+              >
+                Sign out
+              </button>
             </span>
             <span className="inline sm:hidden">
-              <LogIn className="text-cyan-500/50 transition-colors hover:text-cyan-500" />
+              <LogIn className="text-gray-700/50 transition-colors hover:text-gray-500" />
             </span>
           </div>
         )}
