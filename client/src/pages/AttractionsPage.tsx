@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useAttractionStore } from "../store/useAttractionStore";
 import { useParams } from "react-router-dom";
-import { Navigate } from "react-router-dom";
 
 const AttractionsPage = () => {
   const { cityName } = useParams<{ cityName: string }>();

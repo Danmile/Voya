@@ -2,11 +2,15 @@ import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAttractionStore } from "../store/useAttractionStore";
 import { Link } from "react-router-dom";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const SearchBar = () => {
   const [destination, setDestination] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const [isCitySelected, setIsCitySelected] = useState(false);
+  const [range, setRange] = useState<[Date | null, Date | null]>([null, null]);
+  const [startDate, endDate] = range;
 
   const { cities, getCities } = useAttractionStore();
 
@@ -42,12 +46,12 @@ const SearchBar = () => {
         className="flex items-center p-1 md:flex-row gap-4 md:justify-start w-full"
         action=""
       >
-        <div className="flex md:flex-row gap-4 flex-1 p-1">
-          <div className="hidden md:flex justify-center items-center bg-blue-100 rounded-4xl p-4">
+        <div className="flex lg:flex-row gap-4 flex-1 p-1">
+          <div className="hidden lg:flex justify-center items-center bg-blue-100 rounded-4xl p-4">
             <img src="/src/assets/pin.png" alt="" width={150} />
           </div>
-          <div className="relative flex flex-col w-full p-3">
-            <h1 className="hidden md:block mb-1">Location</h1>
+          <div className="flex relative flex-col w-full p-3">
+            <h1 className="hidden lg:block mb-1">Location</h1>
             <input
               type="text"
               value={destination}
@@ -69,15 +73,21 @@ const SearchBar = () => {
               </ul>
             )}
           </div>
-          <div className="hidden md:flex justify-center items-center bg-violet-100 rounded-4xl p-4">
+          <div className="hidden lg:flex justify-center items-center bg-violet-100 rounded-4xl p-4">
             <img src="/src/assets/date.png" alt="" width={150} />
           </div>
-          <div className="hidden md:flex flex-col w-full p-3">
+          <div className="hidden lg:flex flex-col w-full">
             <h1 className="mb-1">Date</h1>
-            <input
-              type="date"
-              className="text-sm rounded w-full focus:outline-none focus:ring-0"
-              placeholder="Choose a date"
+            <DatePicker
+              selectsRange
+              startDate={startDate}
+              endDate={endDate}
+              onChange={(update) =>
+                setRange(update as [Date | null, Date | null])
+              }
+              isClearable
+              placeholderText="Select a date range"
+              className="text-xs rounded w-full focus:outline-none focus:ring-0 mr-6 py-2 px-2 border border-gray-300"
             />
           </div>
           <div className="hidden lg:flex justify-center items-center bg-green-100 rounded-4xl p-4">
