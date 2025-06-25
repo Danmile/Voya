@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { LogIn } from "lucide-react";
 import voyalogo from "../assets/voyaLogo.svg";
-import Button from "./Button";
 import { useAuthStore } from "../store/useAuthStore";
 
 const Navbar = () => {

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import bg2 from "../assets/bg2.svg";
 import toast from "react-hot-toast";
 import { useAuthStore } from "../store/useAuthStore";
 import { useParams } from "react-router-dom";
