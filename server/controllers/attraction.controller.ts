@@ -10,6 +10,22 @@ interface City {
   lon: number;
 }
 
+interface TripRequestBody {
+  attractions: string | string[];
+  time: {
+    start: string;
+    end: string;
+  };
+  budget?: number;
+}
+
+interface Attraction {
+  name: string;
+  lat: number;
+  lon: number;
+  price: number;
+}
+
 const fetchImages = async (popularCities: City[]): Promise<City[]> => {
   const citiesWithImages = await Promise.all(
     popularCities.map(async (city) => {
@@ -41,6 +57,24 @@ const fetchImages = async (popularCities: City[]): Promise<City[]> => {
   );
 
   return citiesWithImages;
+};
+
+const getDistanceKm = (
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number
+) => {
+  const R = 6371; // Radius of the Earth in km
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c; // Distance in km
 };
 
 const fetchWikimediaImage = async (
@@ -190,5 +224,106 @@ export const getTopCities = async (req: Request, res: Response) => {
   } catch (error: any) {
     console.error("Error fetching cities:", error.message);
     res.status(500).json({ message: "Server Error" });
+  }
+};
+
+export const getTrip = async (
+  req: Request<{}, {}, TripRequestBody>,
+  res: Response
+) => {
+  const { attractions, time, budget } = req.body;
+
+  if (!time || typeof time !== "object" || !time.start || !time.end) {
+    res.status(400).json({ message: "Time range (start and end) is required" });
+    return;
+  }
+
+  const start = new Date((time as any).start);
+  const end = new Date((time as any).end);
+  const numDays =
+    Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+
+  if (!attractions) {
+    res.status(400).json({ message: "Attractions are not specified" });
+    return;
+  }
+
+  const attractionNames = Array.isArray(attractions)
+    ? attractions
+    : String(attractions).split(",");
+
+  try {
+    // Fetch full attraction objects from DB
+    const attractionDocs = await Promise.all(
+      attractionNames.map((name) =>
+        Attraction.findOne({ name: name.toString().trim() })
+      )
+    );
+
+    // Filter out not found/nulls
+    const validAttractions = attractionDocs.filter(
+      (
+        attr
+      ): attr is NonNullable<typeof attr> & {
+        lat: number;
+        lon: number;
+        price: number;
+      } =>
+        !!attr &&
+        typeof attr.price === "number" &&
+        typeof attr.lat === "number" &&
+        typeof attr.lon === "number"
+    );
+
+    const totalCost = validAttractions.reduce(
+      (sum, attr) => sum + attr.price,
+      0
+    );
+
+    if (budget && totalCost > Number(budget)) {
+      res.status(400).json({ message: "Budget is too low" });
+      return;
+    }
+
+    // Group attractions by proximity and day
+    const groupedByDay: { name: string; attractions: Attraction[] }[] =
+      Array.from({ length: numDays }, (_, index) => ({
+        name: `Day ${index + 1}`,
+        attractions: [],
+      }));
+
+    const attractionsLeft = [...validAttractions];
+
+    for (let day = 0; day < numDays && attractionsLeft.length > 0; day++) {
+      const anchor = attractionsLeft.shift();
+      if (!anchor) continue;
+
+      groupedByDay[day].attractions.push(anchor);
+
+      // Find close attractions within 2.5km
+      const nearby = attractionsLeft.filter(
+        (attr) =>
+          getDistanceKm(anchor.lat, anchor.lon, attr.lat, attr.lon) < 2.5
+      );
+
+      // Add up to 2 nearby attractions
+      const toAdd = nearby.slice(0, 3);
+      groupedByDay[day].attractions.push(...toAdd);
+
+      // Remove them from remaining list
+      for (const added of toAdd) {
+        const index = attractionsLeft.findIndex((a) => a.name === added.name);
+        if (index !== -1) attractionsLeft.splice(index, 1);
+      }
+    }
+
+    res.status(200).json({
+      totalCost,
+      numDays,
+      groupedByDay,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
   }
 };
