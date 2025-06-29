@@ -14,15 +14,18 @@ interface Attraction {
 
 interface AttractionState {
   cities: City[] | null;
-  attractions: Attraction[] | null;
+  attractions: Attraction[];
+  favorites: Attraction[];
 
   getCities: (city: string) => Promise<void>;
   getAttractions: (city: string) => Promise<void>;
+  setFavorites: (favorite: Attraction) => void;
 }
 
 export const useAttractionStore = create<AttractionState>((set, get) => ({
   cities: null,
-  attractions: null,
+  attractions: [],
+  favorites: [],
 
   getCities: async (data) => {
     try {
@@ -46,6 +49,20 @@ export const useAttractionStore = create<AttractionState>((set, get) => ({
       set({ attractions: res.data });
     } catch (error) {
       console.error("Error in getAttractions", error);
+    }
+  },
+  setFavorites: (favorite) => {
+    const currentFavorites = get().favorites;
+    const isAlreadyFavorite = currentFavorites.some(
+      (fav) => fav.name === favorite.name
+    );
+
+    if (isAlreadyFavorite) {
+      set({
+        favorites: currentFavorites.filter((fav) => fav.name !== favorite.name),
+      });
+    } else {
+      set({ favorites: [...currentFavorites, favorite] });
     }
   },
 }));
