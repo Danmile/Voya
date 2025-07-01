@@ -9,6 +9,7 @@ import { useAuthStore } from "./store/useAuthStore";
 import RegisterPage from "./pages/Registerpage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import AttractionsPage from "./pages/AttractionsPage";
+import TripPage from "./pages/TripPage";
 
 interface ElementProps {
   children: ReactNode;
@@ -59,6 +60,14 @@ function App() {
             element={
               <WithNavBar>
                 <AttractionsPage />
+              </WithNavBar>
+            }
+          />
+          <Route
+            path="/trip/:cityName"
+            element={
+              <WithNavBar>
+                <TripPage />
               </WithNavBar>
             }
           />

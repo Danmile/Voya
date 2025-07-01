@@ -6,7 +6,6 @@ import { useAttractionStore } from "../store/useAttractionStore";
 const AttractionsPage = () => {
   const { cityName } = useParams<{ cityName: string }>();
   const { favorites } = useAttractionStore();
-  console.log(favorites);
 
   return (
     <div className="relative w-full h-full py-16">
@@ -19,7 +18,10 @@ const AttractionsPage = () => {
         <AttractionGrid cityName={cityName} />
       </div>
       {favorites.length !== 0 ? (
-        <AttractionBarComponent AttrNum={favorites.length} />
+        <AttractionBarComponent
+          AttrNum={favorites.length}
+          cityName={cityName}
+        />
       ) : null}
     </div>
   );
