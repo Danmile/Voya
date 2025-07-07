@@ -1,9 +1,9 @@
 import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAttractionStore } from "../store/useAttractionStore";
-import { Link } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { useNavigate } from "react-router-dom";
 
 const SearchBar = () => {
   const [destination, setDestination] = useState("");
@@ -11,8 +11,11 @@ const SearchBar = () => {
   const [isCitySelected, setIsCitySelected] = useState(false);
   const [range, setRange] = useState<[Date | null, Date | null]>([null, null]);
   const [startDate, endDate] = range;
+  const [budget, setBudget] = useState<number | null>(null);
 
-  const { cities, getCities } = useAttractionStore();
+  const navigate = useNavigate();
+
+  const { cities, getCities, setTimeAndBudget } = useAttractionStore();
 
   const handleSelect = async (cityName: string) => {
     setDestination(cityName);
@@ -31,6 +34,29 @@ const SearchBar = () => {
     setIsCitySelected(isValidCity || false);
   };
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (
+      isCitySelected &&
+      destination.trim() &&
+      destination === cities?.[0].name
+    ) {
+      const formatDate = (date: Date | null) =>
+        date ? date.toISOString().split("T")[0] : null;
+
+      const formattedStart = formatDate(startDate); // e.g. "2025-07-01"
+      const formattedEnd = formatDate(endDate); // e.g. "2025-07-03"
+      setTimeAndBudget(
+        { startDate: formattedStart, endDate: formattedEnd },
+        budget
+      );
+      navigate(`/attractions/${encodeURIComponent(destination)}`);
+    } else {
+      alert("Please select a valid destination.");
+    }
+  };
+
   useEffect(() => {
     if (!destination.trim()) return;
 
@@ -45,6 +71,7 @@ const SearchBar = () => {
       <form
         className="flex items-center p-1 md:flex-row gap-4 md:justify-start w-full"
         action=""
+        onSubmit={handleSubmit}
       >
         <div className="flex lg:flex-row gap-4 flex-1 p-1">
           <div className="hidden lg:flex justify-center items-center bg-blue-100 rounded-4xl p-4">
@@ -98,19 +125,15 @@ const SearchBar = () => {
             <h1 className="mb-1">Price</h1>
             <input
               type="number"
+              value={budget !== null ? budget : ""}
+              onChange={(e) => setBudget(Number(e.target.value))}
               className="text-sm rounded w-full focus:outline-none focus:ring-0"
               placeholder="Your budget"
             />
           </div>
         </div>
-        <Link
-          to={
-            isCitySelected &&
-            destination.trim() &&
-            destination === cities?.[0].name
-              ? `/attractions/${encodeURIComponent(destination)}`
-              : "#"
-          }
+        <button
+          type="submit"
           className={`flex items-center justify-center gap-2 p-3 rounded-4xl ${
             isCitySelected && destination.trim()
               ? "bg-blue-500 hover:bg-blue-600"
@@ -123,7 +146,7 @@ const SearchBar = () => {
           <div className="lg:bg-white rounded-4xl p-2.5 text-white lg:text-black">
             <Search />
           </div>
-        </Link>
+        </button>
       </form>
     </div>
   );
