@@ -1,6 +1,5 @@
 import type { Trips } from "../store/useAttractionStore";
-import { useMap } from "react-leaflet";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import { useEffect } from "react";
 
 interface MapComponentProps {
@@ -38,10 +37,10 @@ const MapComponent = ({ selectedDay, trips }: MapComponentProps) => {
 
   const center = getCenterBySelectedDay(trips, selectedDay);
   return (
-    <div className="w-full h-[500px]">
+    <div className="w-screen h-full overflow-hidden">
       <MapContainer
         center={center}
-        zoom={13}
+        zoom={14}
         scrollWheelZoom={false}
         style={{ height: "100%", width: "100%" }}
       >

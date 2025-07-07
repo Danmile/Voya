@@ -24,37 +24,34 @@ const TripPage = () => {
   }
 
   return (
-    <div className="w-full h-full py-16">
-      <div className="mx-16 mt-5 flex flex-col">
-        <h1 className="text-center font-bold text-4xl">
-          Welcome to {cityName}
-        </h1>
-        <div className="flex items-center justify-center flex-col mt-10">
-          <label htmlFor="day" className="text-xl">
-            Trip by day:
-          </label>
-          <div className="border border-gray-400 rounded p-1">
-            <select
-              className="mx-3 px-2 py-1 rounded text-black"
-              id="day"
-              name="day"
-              onChange={(e) => setSelectedDay(e.target.value)}
-            >
-              {trips &&
-                Object.entries(trips)
-                  .filter(([_, day]) => day.attractions.length > 0)
-                  .map(([dayKey], idx) => (
-                    <option key={idx} value={dayKey}>
-                      {dayKey}
-                    </option>
-                  ))}
-            </select>
+    <div className="w-full h-screen py-16 overflow-hidden">
+      <div className="mt-5 flex flex-col">
+        <div className="flex items-center justify-center">
+          <div className="w-full overflow-x-auto">
+            <div className="flex items-center justify-center">
+              <div className=" bg-gray-200 p-1 rounded-2xl mb-1">
+                {trips &&
+                  Object.entries(trips)
+                    .filter(([_, day]) => day.attractions.length > 0)
+                    .map(([dayKey], idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setSelectedDay(dayKey)}
+                        className={`px-4 py-2 ${
+                          selectedDay === dayKey
+                            ? "bg-white text-black border-gray-400 rounded-2xl"
+                            : "text-black"
+                        }`}
+                      >
+                        {dayKey}
+                      </button>
+                    ))}
+              </div>
+            </div>
           </div>
         </div>
-        <div className="w-full h-full border-1 border-gray-400 mt-5 p-1 rounded-2xl">
-          <MapComponent selectedDay={selectedDay} trips={trips} />
-        </div>
       </div>
+      <MapComponent selectedDay={selectedDay} trips={trips} />
     </div>
   );
 };
