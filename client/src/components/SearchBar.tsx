@@ -7,6 +7,7 @@ import useIsMobile from "../hooks/useIsMobile";
 import BudgetInput from "./inputs/BudgetInput";
 import DateInput from "./inputs/DateInput";
 import DestinationInput from "./inputs/DestinationInput";
+import { toast } from "react-hot-toast";
 
 const SearchBar = () => {
   const [destination, setDestination] = useState("");
@@ -41,28 +42,75 @@ const SearchBar = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (step !== 3) {
+
+    if (!destination.trim()) {
+      toast.error("Please enter a destination.");
       return;
     }
 
     if (
-      isCitySelected &&
-      destination.trim() &&
-      destination === cities?.[0].name
+      !cities?.some(
+        (city) => city.name.toLowerCase() === destination.toLowerCase()
+      )
     ) {
-      const formatDate = (date: Date | null) =>
-        date ? date.toISOString().split("T")[0] : null;
-
-      const formattedStart = formatDate(startDate); // e.g. "2025-07-01"
-      const formattedEnd = formatDate(endDate); // e.g. "2025-07-03"
-      setTimeAndBudget(
-        { startDate: formattedStart, endDate: formattedEnd },
-        budget
-      );
-      navigate(`/attractions/${encodeURIComponent(destination)}`);
-    } else {
-      alert("Please select a valid destination.");
+      toast.error("Please select a valid destination from the list.");
+      return;
     }
+
+    if (!startDate) {
+      toast.error("Please select a start date.");
+      return;
+    }
+
+    if (!endDate) {
+      toast.error("Please select an end date.");
+      return;
+    }
+
+    if (startDate && endDate && startDate > endDate) {
+      toast.error("End date cannot be before start date.");
+      return;
+    }
+
+    if (budget === null || budget === undefined) {
+      toast.error("Please enter a budget.");
+      return;
+    }
+
+    if (budget <= 0) {
+      toast.error("Budget must be a positive number.");
+      return;
+    }
+
+    // All validations passed — proceed
+    const formatDate = (date: Date | null) =>
+      date ? date.toISOString().split("T")[0] : null;
+
+    const formattedStart = formatDate(startDate);
+    const formattedEnd = formatDate(endDate);
+
+    setTimeAndBudget(
+      { startDate: formattedStart, endDate: formattedEnd },
+      budget
+    );
+
+    navigate(`/attractions/${encodeURIComponent(destination)}`);
+  };
+
+  const handleNextStep = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (step === 0 && (!destination.trim() || !isCitySelected)) {
+      toast.error("Please choose a valid destination.");
+      return;
+    }
+
+    if (step === 1 && (!startDate || !endDate)) {
+      toast.error("Please choose a valid date range.");
+      return;
+    }
+
+    setStep(step + 1);
   };
 
   useEffect(() => {
@@ -116,7 +164,7 @@ const SearchBar = () => {
         {isMobile && step !== 2 ? (
           <button
             type="button"
-            onClick={() => setStep(step + 1)}
+            onClick={(e) => handleNextStep(e)}
             className={`flex items-center justify-center gap-2 p-3 rounded-4xl ${
               isCitySelected && destination.trim()
                 ? "bg-blue-500 hover:bg-blue-600"

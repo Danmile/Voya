@@ -72,7 +72,11 @@ function App() {
             }
           />
         </Routes>
-        <Toaster position="top-center" reverseOrder={false} />
+        <Toaster
+          position="top-center"
+          containerClassName="mt-20"
+          reverseOrder={false}
+        />
       </>
     </>
   );
