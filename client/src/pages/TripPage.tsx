@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
 import MapComponent from "../components/MapComponent";
-import { useParams } from "react-router-dom";
 import { useAttractionStore } from "../store/useAttractionStore";
 
 const TripPage = () => {
   const [selectedDay, setSelectedDay] = useState("Day1");
-  const { cityName } = useParams();
   const { getTrip, trips, loading } = useAttractionStore();
 
   useEffect(() => {

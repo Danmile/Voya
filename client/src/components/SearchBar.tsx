@@ -1,9 +1,12 @@
-import { Search } from "lucide-react";
+import { Search, ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAttractionStore } from "../store/useAttractionStore";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useNavigate } from "react-router-dom";
+import useIsMobile from "../hooks/useIsMobile";
+import BudgetInput from "./inputs/BudgetInput";
+import DateInput from "./inputs/DateInput";
+import DestinationInput from "./inputs/DestinationInput";
 
 const SearchBar = () => {
   const [destination, setDestination] = useState("");
@@ -12,11 +15,13 @@ const SearchBar = () => {
   const [range, setRange] = useState<[Date | null, Date | null]>([null, null]);
   const [startDate, endDate] = range;
   const [budget, setBudget] = useState<number | null>(null);
+  const [step, setStep] = useState(0);
+
+  const isMobile = useIsMobile();
 
   const navigate = useNavigate();
 
   const { cities, getCities, setTimeAndBudget } = useAttractionStore();
-
   const handleSelect = async (cityName: string) => {
     setDestination(cityName);
     setShowDropdown(false);
@@ -36,6 +41,9 @@ const SearchBar = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (step !== 3) {
+      return;
+    }
 
     if (
       isCitySelected &&
@@ -77,76 +85,68 @@ const SearchBar = () => {
           <div className="hidden lg:flex justify-center items-center bg-blue-100 rounded-4xl p-4">
             <img src="/src/assets/pin.png" alt="" width={150} />
           </div>
-          <div className="flex relative flex-col w-full p-3">
-            <h1 className="hidden lg:block mb-1">Location</h1>
-            <input
-              type="text"
-              value={destination}
+          {step === 0 && (
+            <DestinationInput
+              destination={destination}
               onChange={handleInputChange}
-              className="text-sm rounded w-full focus:outline-none focus:ring-0"
-              placeholder="Search your destination"
+              cities={cities}
+              showDropdown={showDropdown}
+              onSelect={handleSelect}
             />
-            {showDropdown && cities && cities.length > 0 && (
-              <ul className="absolute top-10 z-10 w-[14rem] bg-white border border-gray-300 rounded-4xl max-h-60 overflow-y-auto shadow-md md:top-15">
-                {cities.map((city, index) => (
-                  <li
-                    key={index}
-                    onClick={() => handleSelect(city.name)}
-                    className="p-2 hover:bg-gray-100 cursor-pointer"
-                  >
-                    {city.name}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+          )}
+
           <div className="hidden lg:flex justify-center items-center bg-violet-100 rounded-4xl p-4">
             <img src="/src/assets/date.png" alt="" width={150} />
           </div>
-          <div className="hidden lg:flex flex-col w-full p-3">
-            <h1 className="mb-1">Date</h1>
-            <DatePicker
-              selectsRange
-              startDate={startDate}
-              endDate={endDate}
-              onChange={(update) =>
-                setRange(update as [Date | null, Date | null])
-              }
-              isClearable
-              placeholderText="Select a date range"
-              className="text-sm rounded w-full focus:outline-none focus:ring-0"
-            />
-          </div>
+          {isMobile ? (
+            step === 1 && <DateInput range={range} setRange={setRange} />
+          ) : (
+            <DateInput range={range} setRange={setRange} />
+          )}
+
           <div className="hidden lg:flex justify-center items-center bg-green-100 rounded-4xl p-4">
             <img src="/src/assets/dollar.png" width={150} />
           </div>
-
-          <div className="hidden lg:flex flex-col w-full p-3">
-            <h1 className="mb-1">Price</h1>
-            <input
-              type="number"
-              value={budget !== null ? budget : ""}
-              onChange={(e) => setBudget(Number(e.target.value))}
-              className="text-sm rounded w-full focus:outline-none focus:ring-0"
-              placeholder="Your budget"
-            />
-          </div>
+          {isMobile ? (
+            step === 2 && <BudgetInput budget={budget} onChange={setBudget} />
+          ) : (
+            <BudgetInput budget={budget} onChange={setBudget} />
+          )}
         </div>
-        <button
-          type="submit"
-          className={`flex items-center justify-center gap-2 p-3 rounded-4xl ${
-            isCitySelected && destination.trim()
-              ? "bg-blue-500 hover:bg-blue-600"
-              : "bg-gray-400"
-          } transition`}
-        >
-          <h1 className="hidden lg:block rounded-4xl text-white font-normal mx-2">
-            Find my adventure
-          </h1>
-          <div className="lg:bg-white rounded-4xl p-2.5 text-white lg:text-black">
-            <Search />
-          </div>
-        </button>
+        {isMobile && step !== 2 ? (
+          <button
+            type="button"
+            onClick={() => setStep(step + 1)}
+            className={`flex items-center justify-center gap-2 p-3 rounded-4xl ${
+              isCitySelected && destination.trim()
+                ? "bg-blue-500 hover:bg-blue-600"
+                : "bg-gray-400"
+            } transition`}
+          >
+            <h1 className="hidden lg:block rounded-4xl text-white font-normal mx-2">
+              Find my adventure
+            </h1>
+            <div className="lg:bg-white rounded-4xl p-2.5 text-white lg:text-black">
+              <ArrowRight />
+            </div>
+          </button>
+        ) : (
+          <button
+            type="submit"
+            className={`flex items-center justify-center gap-2 p-3 rounded-4xl ${
+              isCitySelected && destination.trim()
+                ? "bg-blue-500 hover:bg-blue-600"
+                : "bg-gray-400"
+            } transition`}
+          >
+            <h1 className="hidden lg:block rounded-4xl text-white font-normal mx-2">
+              Find my adventure
+            </h1>
+            <div className="lg:bg-white rounded-4xl p-2.5 text-white lg:text-black">
+              <Search />
+            </div>
+          </button>
+        )}
       </form>
     </div>
   );
