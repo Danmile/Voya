@@ -197,33 +197,25 @@ export const getCities = async (req: Request, res: Response) => {
 };
 
 export const getTopCities = async (req: Request, res: Response) => {
-  const { country } = req.query;
+  const { countryCode } = req.params;
+
+  if (!countryCode) {
+    res.status(400).json({ message: "Missing country code" });
+    return;
+  }
+
   try {
-    const response = await axios.get("https://google.serper.dev/places", {
-      params: {
-        q: `top+cities+to+visit+in+${country}`,
-      },
-      headers: {
-        "X-API-KEY": process.env.SERPER_API_KEY,
-        "Content-Type": "application/json",
-      },
-    });
-    const topCities = response.data.places;
-
-    if (!topCities && topCities.length === 0) {
-      res.status(404).json({ message: `There is no cities in this region` });
+    const cities = await City.find({ countryCode: countryCode.toUpperCase() });
+    if (!cities.length) {
+      res
+        .status(404)
+        .json({ message: "No cities found for this country code" });
+      return;
     }
-    const extractedCityData = topCities.map((place: any) => ({
-      name: place.title,
-      latitude: place.latitude,
-      longitude: place.longitude,
-    }));
-
-    const citiesWithImages = await fetchImages(extractedCityData);
-    res.json(citiesWithImages);
-  } catch (error: any) {
-    console.error("Error fetching cities:", error.message);
-    res.status(500).json({ message: "Server Error" });
+    res.status(200).json(cities);
+  } catch (error) {
+    console.error("Error fetching cities:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -231,15 +223,23 @@ export const getTrip = async (
   req: Request<{}, {}, TripRequestBody>,
   res: Response
 ) => {
-  const { attractions, time, budget } = req.body;
+  const { attractions, time, budget } = req.query;
 
-  if (!time || typeof time !== "object" || !time.start || !time.end) {
-    res.status(400).json({ message: "Time range (start and end) is required" });
+  if (!time) {
+    res.status(400).json({ message: "Time is required" });
     return;
   }
 
-  const start = new Date((time as any).start);
-  const end = new Date((time as any).end);
+  let parsedTime: { start: string; end: string };
+  try {
+    parsedTime = JSON.parse(time as string);
+  } catch (err) {
+    res.status(400).json({ message: "Invalid time format" });
+    return;
+  }
+
+  const start = new Date(parsedTime.start);
+  const end = new Date(parsedTime.end);
   const numDays =
     Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
 

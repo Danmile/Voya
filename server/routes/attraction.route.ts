@@ -12,7 +12,7 @@ const router = express.Router();
 
 // Attraction routes
 router.get("/cities", getCities);
-router.get("/topcities", getTopCities);
+router.get("/topcities/:countryCode", getTopCities);
 router.get("/attractions", attractions);
 router.get("/trip", getTrip);
 router.post("/user/attractions", protectRoute, favoriteAttraction);
