@@ -1,5 +1,5 @@
 import { popularCountries } from "../constants/PopularCounties";
-
+import { toast } from "react-hot-toast";
 const ExploreComponent = () => {
   return (
     <div className="relative w-full h-full">
@@ -28,7 +28,10 @@ const ExploreComponent = () => {
             Explore
           </h1>
           <h1 className="text-md text-center md:text-xl">Top Attractions</h1>
-          <button className="bg-white text-sm rounded-2xl p-3 drop-shadow-xl mt-4 cursor-pointer text-center transition duration-300 hover:scale-105 md:text-lg">
+          <button
+            onClick={() => toast.success("This function is coming soon")}
+            className="bg-white text-sm rounded-2xl p-3 drop-shadow-xl mt-4 cursor-pointer text-center transition duration-300 hover:scale-105 md:text-lg"
+          >
             DISCOVER NOW
           </button>
         </div>

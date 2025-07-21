@@ -1,23 +1,41 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAttractionStore } from "../store/useAttractionStore";
+import type { City } from "../store/useAttractionStore";
 
 interface CityGridProps {
   countryCode?: string;
 }
 
 const CityGrid = ({ countryCode }: CityGridProps) => {
-  const { cities, getCityByCountry } = useAttractionStore();
+  const { cities, getCityByCountry, getCityDescription, cityDescription } =
+    useAttractionStore();
+  const [selectedCity, setSelectedCity] = useState<null | City>(null);
 
   useEffect(() => {
     if (!countryCode) return;
     getCityByCountry(countryCode);
   }, [countryCode]);
 
-  // If cities is undefined (e.g., not yet fetched), show loading
+  useEffect(() => {
+    if (selectedCity) {
+      getCityDescription(selectedCity.name);
+    }
+  }, [selectedCity]);
+
+  const SkeletonCard = () => (
+    <div className="animate-pulse space-y-4">
+      <div className="h-64 bg-black rounded-2xl w-full"></div>
+      <div className="h-6 bg-black rounded w-3/4 mx-auto"></div>
+    </div>
+  );
+
+  // While loading
   if (!cities) {
     return (
-      <div className="text-xl flex h-screen items-center justify-center">
-        <h1>Loading cities...</h1>
+      <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <SkeletonCard key={index} />
+        ))}
       </div>
     );
   }
@@ -34,7 +52,11 @@ const CityGrid = ({ countryCode }: CityGridProps) => {
   return (
     <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
       {cities.map((city, index) => (
-        <div key={index} className="relative rounded-2xl overflow-hidden">
+        <div
+          key={index}
+          onClick={() => setSelectedCity(city)}
+          className="relative rounded-2xl overflow-hidden cursor-pointer"
+        >
           <img
             className="object-fill rounded-2xl w-full h-110 md:h-90"
             src={city.imageUrl}
@@ -49,6 +71,33 @@ const CityGrid = ({ countryCode }: CityGridProps) => {
           <h1 className="text-2xl mt-5 font-semibold">{city.name}</h1>
         </div>
       ))}
+      {selectedCity && (
+        <div className="fixed inset-0 z-50 bg-opacity-70 bg-gray-300/50 flex items-center justify-center">
+          <div className="bg-white rounded-2xl p-8 max-w-lg w-full relative transition-all duration-300 ease-out">
+            <h1 className="text-4xl font-bold text-center mb-5">
+              {selectedCity.name}
+            </h1>
+            <button
+              onClick={() => setSelectedCity(null)}
+              className="absolute top-3 right-3 text-gray-500 hover:text-black"
+            >
+              ✕
+            </button>
+            <img
+              src={selectedCity.imageUrl}
+              alt={selectedCity.name}
+              className="rounded-xl w-full h-64 object-cover mb-4"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.onerror = null;
+                target.src =
+                  "https://img.freepik.com/free-photo/big-city_1127-3102.jpg?semt=ais_hybrid&w=740";
+              }}
+            />
+            <p className="text-gray-700">{cityDescription}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

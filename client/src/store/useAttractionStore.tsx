@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { axiosInstance } from "../lib/axios";
 
-interface City {
+export interface City {
   name: string;
   imageUrl: string;
 }
@@ -48,10 +48,12 @@ interface AttractionState {
   trips: Trips | null;
   time: Time | null;
   budget: number | null;
+  cityDescription: string | null;
 
   getCities: (city: string) => Promise<void>;
   getCountries: () => Promise<void>;
   getCityByCountry: (country: string) => Promise<void>;
+  getCityDescription: (cityName: string) => Promise<void>;
   getAttractions: (city: string) => Promise<void>;
   setFavorites: (favorite: Attraction) => void;
   getTrip: () => Promise<void>;
@@ -69,6 +71,7 @@ export const useAttractionStore = create<AttractionState>()(
       budget: null,
       loading: false,
       countries: null,
+      cityDescription: null,
 
       getCities: async (city) => {
         try {
@@ -102,6 +105,21 @@ export const useAttractionStore = create<AttractionState>()(
         } catch (error) {
           console.error("Error in getCityByCountry:", error);
           set({ cities: [] });
+        }
+      },
+      getCityDescription: async (cityName) => {
+        try {
+          set({ cityDescription: null }); // reset before loading
+          const res = await fetch(
+            `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(
+              cityName
+            )}`
+          );
+          const data = await res.json();
+          set({ cityDescription: data.extract || "No description found." });
+        } catch (error) {
+          console.error("Error fetching city description:", error);
+          set({ cityDescription: "Failed to load city description." });
         }
       },
 
