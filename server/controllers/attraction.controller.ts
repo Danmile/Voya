@@ -3,6 +3,7 @@ import Attraction from "../models/attraction.model";
 import { Request, Response } from "express";
 import axios from "axios";
 import City from "../models/city.model";
+import Country from "../models/country.model";
 
 interface City {
   name: string;
@@ -193,6 +194,16 @@ export const getCities = async (req: Request, res: Response) => {
       res.status(404).json({ message: "Invalid city" });
     }
     res.status(200).json(cities);
+  } catch (error) {}
+};
+
+export const getCountries = async (req: Request, res: Response) => {
+  try {
+    const countries = await Country.find();
+    if (!countries) {
+      res.status(404).json({ message: "No countries found" });
+    }
+    res.status(200).json(countries);
   } catch (error) {}
 };
 
