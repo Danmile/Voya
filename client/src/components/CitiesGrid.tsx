@@ -21,7 +21,6 @@ const CityGrid = ({ countryCode }: CityGridProps) => {
       </div>
     );
   }
-  console.log(cities);
 
   // If cities is fetched but empty
   if (cities.length === 0) {
@@ -40,6 +39,12 @@ const CityGrid = ({ countryCode }: CityGridProps) => {
             className="object-fill rounded-2xl w-full h-110 md:h-90"
             src={city.imageUrl}
             alt={city.name}
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.onerror = null;
+              target.src =
+                "https://img.freepik.com/free-photo/big-city_1127-3102.jpg?semt=ais_hybrid&w=740";
+            }}
           />
           <h1 className="text-2xl mt-5 font-semibold">{city.name}</h1>
         </div>

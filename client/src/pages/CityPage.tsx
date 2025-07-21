@@ -11,7 +11,7 @@ const CityPage = () => {
     <div className="relative w-full h-full py-16">
       <div className="flex justify-between mt-10 mx-5">
         <h1 className="text-5xl font-semibold md:text-6xl">
-          Choose your attractions in {countryName}
+          Choose your city in {countryName}
         </h1>
       </div>
       <div className="flex flex-wrap items-center justify-center mt-10 mx-10">
