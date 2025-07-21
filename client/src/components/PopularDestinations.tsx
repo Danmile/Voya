@@ -1,9 +1,13 @@
-import { popularCountries } from "../constants/PopularCounties";
-import { useRef } from "react";
+import { Link } from "react-router-dom";
+import { useEffect, useRef } from "react";
+import { useAttractionStore } from "../store/useAttractionStore";
 
 const PopularDestinations = () => {
+  const { countries, getCountries } = useAttractionStore();
+  useEffect(() => {
+    getCountries();
+  }, []);
   const scrollRef = useRef<HTMLDivElement>(null);
-
   const scrollLeft = () => {
     scrollRef.current?.scrollBy({
       left: -scrollRef.current?.offsetWidth,
@@ -30,8 +34,10 @@ const PopularDestinations = () => {
         ref={scrollRef}
         className="w-full flex snap-x snap-mandatory overflow-x-auto my-10 scrollbar-hide max-w-[100rem]"
       >
-        {popularCountries.map((country) => (
-          <div
+        {countries?.map((country) => (
+          <Link
+            to={`/cities/${encodeURIComponent(country.code)}`}
+            state={{ countryName: country.name }}
             key={country.name}
             className="shrink-0 w-72 md:w-1/3 rounded-2xl px-4"
           >
@@ -43,7 +49,7 @@ const PopularDestinations = () => {
             <h1 className="text-center text-2xl mt-5 font-semibold">
               {country.name}
             </h1>
-          </div>
+          </Link>
         ))}
       </div>
       <button

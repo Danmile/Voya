@@ -4,6 +4,7 @@ import { axiosInstance } from "../lib/axios";
 
 interface City {
   name: string;
+  imageUrl: string;
 }
 
 export interface Attraction {
@@ -26,12 +27,21 @@ interface Trip {
   budget: number;
 }
 
+interface Country {
+  name: string;
+  code: string;
+  lat: number;
+  lon: number;
+  imageUrl: string;
+}
+
 export type Trips = {
   [key: string]: Trip; // e.g., { Day1: { attractions: [...] }, Day2: { attractions: [...] } }
 };
 
 interface AttractionState {
   cities: City[] | null;
+  countries: Country[] | null;
   loading: boolean;
   attractions: Attraction[];
   favorites: Attraction[];
@@ -40,6 +50,8 @@ interface AttractionState {
   budget: number | null;
 
   getCities: (city: string) => Promise<void>;
+  getCountries: () => Promise<void>;
+  getCityByCountry: (country: string) => Promise<void>;
   getAttractions: (city: string) => Promise<void>;
   setFavorites: (favorite: Attraction) => void;
   getTrip: () => Promise<void>;
@@ -56,6 +68,7 @@ export const useAttractionStore = create<AttractionState>()(
       time: null,
       budget: null,
       loading: false,
+      countries: null,
 
       getCities: async (city) => {
         try {
@@ -65,6 +78,30 @@ export const useAttractionStore = create<AttractionState>()(
           set({ cities: res.data });
         } catch (error) {
           console.error("Error in getCities:", error);
+        }
+      },
+
+      getCountries: async () => {
+        try {
+          set({ countries: null });
+          const res = await axiosInstance.get("attraction/countries");
+          set({ countries: res.data });
+        } catch (error) {
+          console.error("Error in getCountries:", error);
+          set({ countries: [] });
+        }
+      },
+
+      getCityByCountry: async (countryCode) => {
+        try {
+          set({ cities: null });
+          const res = await axiosInstance.get(
+            `/attraction/topcities/${countryCode}`
+          );
+          set({ cities: res.data });
+        } catch (error) {
+          console.error("Error in getCityByCountry:", error);
+          set({ cities: [] });
         }
       },
 

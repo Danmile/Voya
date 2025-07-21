@@ -10,6 +10,8 @@ import RegisterPage from "./pages/Registerpage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import AttractionsPage from "./pages/AttractionsPage";
 import TripPage from "./pages/TripPage";
+import FavoriteTrips from "./pages/FavoriteTrips";
+import CityPage from "./pages/CityPage";
 
 interface ElementProps {
   children: ReactNode;
@@ -56,6 +58,10 @@ function App() {
             element={!authUser ? <ResetPasswordPage /> : <Navigate to="/" />}
           />
           <Route
+            path="/mytrips"
+            element={!authUser ? <LoginPage /> : <FavoriteTrips />}
+          />
+          <Route
             path="/attractions/:cityName"
             element={
               <WithNavBar>
@@ -68,6 +74,14 @@ function App() {
             element={
               <WithNavBar>
                 <TripPage />
+              </WithNavBar>
+            }
+          />
+          <Route
+            path="/cities/:countryCode"
+            element={
+              <WithNavBar>
+                <CityPage />
               </WithNavBar>
             }
           />

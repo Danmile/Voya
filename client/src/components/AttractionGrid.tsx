@@ -6,6 +6,8 @@ interface Attraction {
   address: string;
   image: string;
   description: string;
+  lat: number;
+  lon: number;
   // Add more fields if needed
 }
 interface AttractionGridProps {
