@@ -4,6 +4,7 @@ import { Request, Response } from "express";
 import axios from "axios";
 import City from "../models/city.model";
 import Country from "../models/country.model";
+import Trip from "../models/trip.model";
 
 interface City {
   name: string;
@@ -133,45 +134,6 @@ export const attractions = async (
     res.json(attractions);
   } catch (error: any) {
     console.error("Error fetching attractions:", error.message);
-    res.status(500).json({ message: "Server Error" });
-  }
-};
-
-export const favoriteAttraction = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
-    const { favAttraction } = req.body;
-    const userId = req.user._id;
-    const attraction = await Attraction.findById(favAttraction._id);
-    if (!attraction) {
-      res
-        .status(404)
-        .json({ error: `Attraction with ID ${favAttraction._id} not found` });
-      return;
-    }
-    // Update user's favorite attractions
-    const updatedUser = await User.findByIdAndUpdate(
-      req.user._id,
-      { $addToSet: { favoriteAttractions: attraction._id } },
-      { new: true, runValidators: true }
-    ).populate("favoriteAttractions", "name cityName"); // Populate attraction details
-
-    if (!updatedUser) {
-      res.status(404).json({ error: "User not found" });
-      return;
-    }
-    res.status(201).json({
-      message: "Attraction added to favorite attractions successfully",
-      attraction: {
-        _id: attraction._id,
-        name: attraction.name,
-      },
-      favoriteAttractions: updatedUser.favoriteAttractions,
-    });
-  } catch (error: any) {
-    console.error("Error fetching favorite attractions:", error.message);
     res.status(500).json({ message: "Server Error" });
   }
 };
@@ -336,5 +298,42 @@ export const getTrip = async (
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const saveTrip = async (req: Request, res: Response) => {
+  const userId = req.user._id;
+  const trip = req.body.trip;
+
+  if (!trip || typeof trip !== "object") {
+    res.status(400).json({ error: "Trip is required" });
+    return;
+  }
+
+  if (!userId) {
+    res.status(401).json({ error: "Invalid or missing user authentication" });
+    return;
+  }
+
+  try {
+    const savedTrip = await Trip.create({ ...trip, user: userId });
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $addToSet: { favoriteTrips: savedTrip._id } },
+      { new: true }
+    ).populate("favoriteTrips");
+
+    if (!updatedUser) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    res.json({
+      message: "Trip added to favorites",
+    });
+  } catch (error) {
+    console.error("Failed to add favorite trip:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 };

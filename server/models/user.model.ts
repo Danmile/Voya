@@ -1,4 +1,4 @@
-import mongoose, { mongo } from "mongoose";
+import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
@@ -22,12 +22,10 @@ const userSchema = new mongoose.Schema(
     resetTokenExpiry: {
       type: Date,
     },
-    favoriteAttractions: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Attraction",
-      },
-    ],
+    favoriteTrips: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Trip",
+    },
   },
   { timestamps: true }
 );
