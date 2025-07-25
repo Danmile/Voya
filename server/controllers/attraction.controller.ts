@@ -28,39 +28,6 @@ interface Attraction {
   price: number;
 }
 
-const fetchImages = async (popularCities: City[]): Promise<City[]> => {
-  const citiesWithImages = await Promise.all(
-    popularCities.map(async (city) => {
-      try {
-        const response = await axios.get(
-          `https://api.pexels.com/v1/search?query=${encodeURIComponent(
-            city.name
-          )}&per_page=1`,
-          {
-            headers: {
-              Authorization: process.env.PEXELS_API_KEY as string,
-            },
-          }
-        );
-
-        const image = response.data.photos?.[0];
-        return {
-          ...city,
-          imageUrl: image ? image.src.landscape : undefined,
-        };
-      } catch (error) {
-        console.error(`Failed to fetch image for ${city.name}`, error);
-        return {
-          ...city,
-          imageUrl: undefined,
-        };
-      }
-    })
-  );
-
-  return citiesWithImages;
-};
-
 const getDistanceKm = (
   lat1: number,
   lon1: number,
@@ -77,37 +44,6 @@ const getDistanceKm = (
       Math.sin(dLon / 2) ** 2;
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c; // Distance in km
-};
-
-const fetchWikimediaImage = async (
-  commonsCategory: string
-): Promise<string | null> => {
-  const category = commonsCategory.replace("Category:", "");
-
-  try {
-    const res = await axios.get("https://commons.wikimedia.org/w/api.php", {
-      params: {
-        action: "query",
-        format: "json",
-        generator: "categorymembers",
-        gcmtitle: `Category:${category}`,
-        gcmtype: "file",
-        gcmlimit: 1,
-        prop: "imageinfo",
-        iiprop: "url",
-        origin: "*", // Required for CORS in browser
-      },
-    });
-
-    const pages = res.data?.query?.pages;
-    if (!pages) return null;
-
-    const firstPage = Object.values(pages)[0] as any;
-    return firstPage?.imageinfo?.[0]?.url || null;
-  } catch (err) {
-    console.error("Error fetching Wikimedia image for:", commonsCategory);
-    return null;
-  }
 };
 
 export const attractions = async (
@@ -322,7 +258,7 @@ export const saveTrip = async (req: Request, res: Response) => {
       userId,
       { $addToSet: { favoriteTrips: savedTrip._id } },
       { new: true }
-    ).populate("favoriteTrips");
+    );
 
     if (!updatedUser) {
       res.status(404).json({ message: "User not found" });
@@ -334,6 +270,55 @@ export const saveTrip = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("Failed to add favorite trip:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const getUserTrips = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user._id;
+
+    const user = await User.findById(userId).populate({
+      path: "favoriteTrips",
+      populate: {
+        path: "groupedByDay.attractions",
+        model: "Attraction",
+      },
+    });
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    res.status(200).json({
+      trips: user,
+    });
+  } catch (error) {
+    console.error("Error in getUserTrips: ", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const removeUserTrip = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user._id;
+    const { tripId } = req.params;
+
+    const deletedTrip = await Trip.findOneAndDelete({
+      _id: tripId,
+      user: userId,
+    });
+    if (!deletedTrip) {
+      res.status(404).json({ message: "No trip found" });
+      return;
+    }
+
+    await User.findByIdAndUpdate(userId, {
+      $pull: { favoriteTrips: tripId },
+    });
+    res.status(200).json({ message: "Trip deleted successfully" });
+  } catch (error) {
+    console.error("Error in removeUserTrip: ", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };

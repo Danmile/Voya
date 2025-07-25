@@ -6,6 +6,8 @@ import {
   getTrip,
   getCountries,
   saveTrip,
+  getUserTrips,
+  removeUserTrip,
 } from "../controllers/attraction.controller";
 import { protectRoute } from "../middleware/auth.middleware";
 
@@ -18,5 +20,7 @@ router.get("/countries", getCountries);
 router.get("/attractions", attractions);
 router.get("/trip", getTrip);
 router.post("/user/trip", protectRoute, saveTrip);
+router.get("/user/trips", protectRoute, getUserTrips);
+router.delete("/user/trips/:tripId", protectRoute, removeUserTrip);
 
 export default router;
