@@ -239,7 +239,7 @@ export const getTrip = async (
 
 export const saveTrip = async (req: Request, res: Response) => {
   const userId = req.user._id;
-  const trip = req.body.trip;
+  const trip = req.body;
 
   if (!trip || typeof trip !== "object") {
     res.status(400).json({ error: "Trip is required" });
@@ -290,9 +290,7 @@ export const getUserTrips = async (req: Request, res: Response) => {
       return;
     }
 
-    res.status(200).json({
-      trips: user,
-    });
+    res.status(200).json(user.favoriteTrips);
   } catch (error) {
     console.error("Error in getUserTrips: ", error);
     res.status(500).json({ error: "Internal server error" });
