@@ -59,7 +59,15 @@ function App() {
           />
           <Route
             path="/mytrips"
-            element={!authUser ? <LoginPage /> : <FavoriteTrips />}
+            element={
+              !authUser ? (
+                <LoginPage />
+              ) : (
+                <WithNavBar>
+                  <FavoriteTrips />
+                </WithNavBar>
+              )
+            }
           />
           <Route
             path="/attractions/:cityName"

@@ -1,17 +1,28 @@
 import { useEffect, useState } from "react";
 import MapComponent from "../components/MapComponent";
 import { useAttractionStore } from "../store/useAttractionStore";
+import { useLocation } from "react-router-dom";
 
 const TripPage = () => {
   const [selectedDay, setSelectedDay] = useState("Day1");
-  const { getTrip, trips, loading } = useAttractionStore();
+  const { getTrip, trips, loading, saveFavTrip, fullTripData } =
+    useAttractionStore();
+  const [saveTrip, setSaveTrip] = useState(false);
+  const location = useLocation();
+  const passedTrip = location.state?.trip;
 
   useEffect(() => {
     const fetchAndLog = async () => {
-      await getTrip();
+      if (passedTrip) {
+        await getTrip(passedTrip);
+        setSaveTrip(true);
+      } else {
+        await getTrip();
+      }
     };
+
     fetchAndLog();
-  }, [getTrip]);
+  }, [passedTrip, getTrip]);
 
   if (loading) {
     return (
@@ -21,29 +32,52 @@ const TripPage = () => {
     );
   }
 
+  const handleSaveTrip = () => {
+    if (saveTrip === true) return;
+    setSaveTrip(true);
+    if (fullTripData) {
+      saveFavTrip(fullTripData);
+    }
+  };
+
   return (
     <div className="w-full h-screen py-16 overflow-hidden">
-      <div className="mt-5 flex flex-col">
+      <div className="mt-2 flex flex-col">
         <div className="flex items-center justify-center">
-          <div className="w-full overflow-x-auto">
-            <div className="flex items-center justify-center">
-              <div className=" bg-gray-200 p-1 rounded-2xl mb-1">
-                {trips &&
-                  Object.entries(trips)
-                    .filter(([_, day]) => day.attractions.length > 0)
-                    .map(([dayKey], idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => setSelectedDay(dayKey)}
-                        className={`px-4 py-2 ${
-                          selectedDay === dayKey
-                            ? "bg-white text-black border-gray-400 rounded-2xl"
-                            : "text-black"
-                        }`}
-                      >
-                        {dayKey}
-                      </button>
-                    ))}
+          <div className="w-full overflow-x-auto relative">
+            <div className="w-full overflow-x-auto relative">
+              <div className="absolute right-2 top-0 z-10">
+                <button
+                  className={`px-3 py-2.5 border rounded-2xl transition-colors duration-200 ${
+                    saveTrip
+                      ? "bg-gray-200 text-black border-gray-300 hover:bg-gray-300"
+                      : "bg-white text-black border-gray-400 hover:bg-gray-100"
+                  }`}
+                  onClick={handleSaveTrip}
+                >
+                  {saveTrip ? "Saved" : "Save Trip"}
+                </button>
+              </div>
+
+              <div className="flex justify-center">
+                <div className="bg-gray-200 p-1 rounded-2xl mb-1 inline-flex gap-2">
+                  {trips &&
+                    Object.entries(trips)
+                      .filter(([_, day]) => day.attractions.length > 0)
+                      .map(([dayKey], idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => setSelectedDay(dayKey)}
+                          className={`px-4 py-2 ${
+                            selectedDay === dayKey
+                              ? "bg-white text-black border-gray-400 rounded-2xl"
+                              : "text-black"
+                          }`}
+                        >
+                          {dayKey}
+                        </button>
+                      ))}
+                </div>
               </div>
             </div>
           </div>

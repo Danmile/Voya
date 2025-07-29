@@ -1,15 +1,7 @@
 import { useEffect } from "react";
 import { useAttractionStore } from "../store/useAttractionStore";
+import type { Attraction } from "../store/useAttractionStore";
 
-interface Attraction {
-  name: string;
-  address: string;
-  image: string;
-  description: string;
-  lat: number;
-  lon: number;
-  // Add more fields if needed
-}
 interface AttractionGridProps {
   cityName?: string;
 }

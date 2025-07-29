@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { axiosInstance } from "../lib/axios";
+import toast from "react-hot-toast";
 
 export interface City {
   name: string;
@@ -8,12 +9,15 @@ export interface City {
 }
 
 export interface Attraction {
+  _id: string;
   name: string;
   image: string;
   description: string;
   address: string;
   lat: number;
   lon: number;
+  price: number;
+  cityName: string;
 }
 
 interface Time {
@@ -25,6 +29,18 @@ interface Trip {
   attractions: Attraction[];
   time: Time;
   budget: number;
+}
+
+export interface UserTrips {
+  _id: string;
+  totalCost: number;
+  numDays: number;
+  groupedByDay: Day[];
+}
+
+interface Day {
+  name: string;
+  attractions: Attraction[];
 }
 
 interface Country {
@@ -46,9 +62,11 @@ interface AttractionState {
   attractions: Attraction[];
   favorites: Attraction[];
   trips: Trips | null;
+  fullTripData: Trip | null;
   time: Time | null;
   budget: number | null;
   cityDescription: string | null;
+  userTrips: UserTrips[] | null;
 
   getCities: (city: string) => Promise<void>;
   getCountries: () => Promise<void>;
@@ -56,7 +74,10 @@ interface AttractionState {
   getCityDescription: (cityName: string) => Promise<void>;
   getAttractions: (city: string) => Promise<void>;
   setFavorites: (favorite: Attraction) => void;
-  getTrip: () => Promise<void>;
+  getTrip: (trip?: UserTrips) => Promise<void>;
+  saveFavTrip: (favTrip: Trip) => Promise<void>;
+  getUserTrips: () => Promise<void>;
+  removeUserTrip: (userId: string) => Promise<void>;
   setTimeAndBudget: (time: Time, budget: number | null) => void;
 }
 
@@ -72,6 +93,8 @@ export const useAttractionStore = create<AttractionState>()(
       loading: false,
       countries: null,
       cityDescription: null,
+      userTrips: null,
+      fullTripData: null,
 
       getCities: async (city) => {
         try {
@@ -152,8 +175,34 @@ export const useAttractionStore = create<AttractionState>()(
         }
       },
 
-      getTrip: async () => {
+      getTrip: async (trip) => {
         set({ trips: null, loading: true });
+        if (trip) {
+          try {
+            const tripAttractions: Trips = trip.groupedByDay.reduce(
+              (acc: Trips, day: Day, index: number) => {
+                const dayKey = `Day${index + 1}`;
+                acc[dayKey] = {
+                  attractions: day.attractions,
+                  time: { startDate: null, endDate: null }, // Or derive if you store them
+                  budget: 0, // Or use trip.totalCost / trip.numDays if needed
+                };
+                return acc;
+              },
+              {}
+            );
+
+            set({
+              trips: tripAttractions,
+              fullTripData: null, // or trip if you want to store it
+              loading: false,
+            });
+
+            return;
+          } catch (error) {
+            console.error("Error processing existing trip:", error);
+          }
+        }
         try {
           const time = {
             start: get().time?.startDate,
@@ -169,6 +218,7 @@ export const useAttractionStore = create<AttractionState>()(
               budget: get().budget,
             },
           });
+
           const tripAttractions = res.data.groupedByDay.reduce(
             (acc: any, day: any, index: number) => {
               const dayKey = `Day${index + 1}`;
@@ -184,10 +234,37 @@ export const useAttractionStore = create<AttractionState>()(
             },
             {}
           );
-
-          set({ trips: tripAttractions, loading: false });
+          set({
+            trips: tripAttractions,
+            fullTripData: res.data,
+            loading: false,
+          });
         } catch (error) {
           console.error("Error in getTrip:", error);
+        }
+      },
+      saveFavTrip: async (favTrip) => {
+        try {
+          await axiosInstance.post("/attraction/user/trip", favTrip);
+          toast.success("Trip saved successfully");
+        } catch (error) {
+          console.error("Error in saveFavTrip:", error);
+        }
+      },
+      getUserTrips: async () => {
+        try {
+          const res = await axiosInstance.get("/attraction/user/trips");
+          set({ userTrips: res.data });
+        } catch (error) {
+          console.error("Error in getUserTrips:", error);
+        }
+      },
+
+      removeUserTrip: async (tripId) => {
+        try {
+          await axiosInstance.delete(`attraction/user/trips/${tripId}`);
+        } catch (error) {
+          console.error("Error in removeUserTrip:", error);
         }
       },
 
