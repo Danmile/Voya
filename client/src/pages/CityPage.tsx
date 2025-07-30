@@ -1,6 +1,5 @@
 import { useParams, useLocation } from "react-router-dom";
 import CityGrid from "../components/CitiesGrid";
-import SearchBar from "../components/SearchBar";
 
 const CityPage = () => {
   const { countryCode } = useParams<{ countryCode: string }>();

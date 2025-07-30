@@ -15,7 +15,7 @@ interface AuthState {
   resetPassword: (data: any, resetToken: string | undefined) => Promise<void>;
 }
 
-export const useAuthStore = create<AuthState>((set, get) => ({
+export const useAuthStore = create<AuthState>((set) => ({
   authUser: null,
   isLogging: false,
   isCheckingAuth: false,
