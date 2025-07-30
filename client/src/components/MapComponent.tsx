@@ -1,6 +1,7 @@
 import type { Trips } from "../store/useAttractionStore";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import { useEffect } from "react";
+import "leaflet/dist/leaflet.css";
 
 interface MapComponentProps {
   selectedDay: string | null;
