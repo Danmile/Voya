@@ -13,8 +13,8 @@ const PORT = process.env.PORT || 5001;
 const app = express();
 
 const allowedOrigins = [
-  "http://localhost:5173", // for local dev
-  "https://voya-zeta.vercel.app", // your deployed frontend
+  "http://localhost:5173", // local dev
+  "https://voya-zeta.vercel.app", // deployed frontend
 ];
 
 app.use(express.json());
