@@ -4,6 +4,7 @@ import { useAttractionStore } from "../store/useAttractionStore";
 import { useLocation } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../store/useAuthStore";
 
 const TripPage = () => {
   const [selectedDay, setSelectedDay] = useState("Day1");
@@ -13,6 +14,7 @@ const TripPage = () => {
   const location = useLocation();
   const passedTrip = location.state?.trip;
   const navigate = useNavigate();
+  const { authUser } = useAuthStore();
 
   useEffect(() => {
     const fetchAndLog = async () => {
@@ -36,13 +38,16 @@ const TripPage = () => {
   }
 
   const handleSaveTrip = () => {
+    if (!authUser) {
+      navigate("/login");
+      return;
+    }
     if (saveTrip === true) return;
     setSaveTrip(true);
     if (fullTripData) {
       saveFavTrip(fullTripData);
     }
   };
-  console.log(fullTripData);
   return (
     <div className="w-full h-screen py-16 overflow-hidden">
       <div className="mt-2 flex flex-col">
