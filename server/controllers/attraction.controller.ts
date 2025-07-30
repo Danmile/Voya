@@ -225,11 +225,13 @@ export const getTrip = async (
         if (index !== -1) attractionsLeft.splice(index, 1);
       }
     }
-
+    const filteredDays = groupedByDay.filter(
+      (day) => day.attractions.length > 0
+    );
     res.status(200).json({
       totalCost,
-      numDays,
-      groupedByDay,
+      numDays: filteredDays.length,
+      groupedByDay: filteredDays,
     });
   } catch (error) {
     console.error(error);
