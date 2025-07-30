@@ -1,30 +1,31 @@
+import { useEffect } from "react";
 import { useAttractionStore } from "../store/useAttractionStore";
-import { useEffect, useState } from "react";
-import type { UserTrips } from "../store/useAttractionStore";
 import { Link } from "react-router-dom";
 
 const FavoriteTrips = () => {
-  const { userTrips, getUserTrips, removeUserTrip } = useAttractionStore();
-  const [tripList, setTripList] = useState<UserTrips[]>();
+  const { userTrips, getUserTrips, loading, removeUserTrip } =
+    useAttractionStore();
 
   useEffect(() => {
-    const fetchTrips = async () => {
-      await getUserTrips();
+    getUserTrips();
+  }, [getUserTrips]);
 
-      // Check and extract trips safely
-      if (userTrips?.length) {
-        setTripList(userTrips);
-      }
-    };
-
-    fetchTrips();
-  }, [getUserTrips, userTrips]);
-
-  if (!tripList?.length) {
+  if (loading) {
     return (
-      <div className="text-center text-xl mt-10">No trips planned yet.</div>
+      <div className="w-full h-screen flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
     );
   }
+
+  if (!userTrips?.length) {
+    return (
+      <div className="text-3xl font-bold mx-auto py-16 flex justify-center items-center h-screen">
+        <h1 className="text-center">No trips planned yet...</h1>
+      </div>
+    );
+  }
+
   const handleRemoveTrip = async (tripId: string) => {
     await removeUserTrip(tripId);
   };
@@ -33,10 +34,9 @@ const FavoriteTrips = () => {
     <div className="max-w-4xl mx-auto px-4 py-16">
       <h1 className="text-3xl font-bold mb-8 my-10">Your Trips</h1>
       <div className="space-y-6">
-        {tripList.map((trip, index) => {
+        {userTrips.map((trip, index) => {
           const firstDay = trip.groupedByDay?.[0];
           const firstAttraction = firstDay?.attractions?.[0];
-
           const imageUrl = firstAttraction?.image || "/fallback.jpg";
           const city = firstAttraction?.cityName || "Unknown City";
 
@@ -52,9 +52,9 @@ const FavoriteTrips = () => {
                   className="object-cover w-full h-56"
                 />
               </div>
-              <div className="absolute top-10 right-10">
+              <div className="absolute top-5 right-5">
                 <button
-                  className="py-1 px-2 border-1 border-gray-400 rounded-2xl cursor-pointer hover:border-gray-600 hover:scale-105"
+                  className="py-1 px-3 bg-white rounded-2xl cursor-pointer hover:border-gray-600 hover:scale-105 md:border-1 md:border-gray-400"
                   onClick={() => handleRemoveTrip(trip._id)}
                 >
                   X
@@ -65,7 +65,7 @@ const FavoriteTrips = () => {
                 <p className="text-gray-700 mb-1">
                   Duration: {trip.numDays} days
                 </p>
-                <p className="text-gray-700 mb-1">Budget: ${trip.totalCost}</p>
+                <p className="text-gray-700 mb-1">Cost: ${trip.totalCost}</p>
                 <button className="mt-4 w-fit px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
                   <Link
                     to={`/trip/${encodeURIComponent(city ?? "")}`}

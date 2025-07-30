@@ -43,7 +43,7 @@ const AttractionGrid = ({ cityName }: AttractionGridProps) => {
             <div className="absolute top-5 right-5">
               <button
                 onClick={() => handleFavorites(attraction)}
-                className={`p-2 rounded-4xl transition ${
+                className={`p-2 rounded-4xl transition-transform duration-300 hover:scale-105 ${
                   !bookmark ? "bg-gray-500/70 hover:bg-black" : "p-2 bg-black"
                 }`}
               >

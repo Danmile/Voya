@@ -6,6 +6,7 @@ interface AuthState {
   authUser: object | null;
   isLogging: boolean;
   isCheckingAuth: boolean;
+  checkingAuth: boolean;
   login: (data: any) => Promise<void>;
   checkAuth: () => Promise<void>;
   logout: () => Promise<void>;
@@ -18,6 +19,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   authUser: null,
   isLogging: false,
   isCheckingAuth: false,
+  checkingAuth: true,
 
   login: async (data) => {
     set({ isLogging: true });
@@ -32,12 +34,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
   checkAuth: async () => {
+    set({ checkingAuth: true });
     try {
       const res = await axiosInstance.get("/auth/check");
-      set({ authUser: res.data });
+      set({ authUser: res.data, checkingAuth: false });
     } catch (error: any) {
       if (error.response?.status === 401) {
-        set({ authUser: null });
+        set({ authUser: null, checkingAuth: false });
       } else {
         console.error("Error in checkAuth", error);
       }

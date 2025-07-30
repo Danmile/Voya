@@ -252,9 +252,10 @@ export const useAttractionStore = create<AttractionState>()(
         }
       },
       getUserTrips: async () => {
+        set({ loading: true });
         try {
           const res = await axiosInstance.get("/attraction/user/trips");
-          set({ userTrips: res.data });
+          set({ userTrips: res.data, loading: false });
         } catch (error) {
           console.error("Error in getUserTrips:", error);
         }
@@ -263,6 +264,9 @@ export const useAttractionStore = create<AttractionState>()(
       removeUserTrip: async (tripId) => {
         try {
           await axiosInstance.delete(`attraction/user/trips/${tripId}`);
+          set((state) => ({
+            userTrips: state.userTrips?.filter((trip) => trip._id !== tripId),
+          }));
         } catch (error) {
           console.error("Error in removeUserTrip:", error);
         }
