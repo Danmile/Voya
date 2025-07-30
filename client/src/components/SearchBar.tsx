@@ -8,6 +8,9 @@ import BudgetInput from "./inputs/BudgetInput";
 import DateInput from "./inputs/DateInput";
 import DestinationInput from "./inputs/DestinationInput";
 import { toast } from "react-hot-toast";
+import pin from "../assets/pin.png";
+import dollar from "../assets/dollar.png";
+import dateImg from "../assets/date.png";
 
 const SearchBar = () => {
   const [destination, setDestination] = useState("");
@@ -131,7 +134,7 @@ const SearchBar = () => {
       >
         <div className="flex lg:flex-row gap-4 flex-1 p-1">
           <div className="hidden lg:flex justify-center items-center bg-blue-100 rounded-4xl p-4">
-            <img src="/src/assets/pin.png" alt="" width={150} />
+            <img src={pin} alt="" width={150} />
           </div>
           {step === 0 && (
             <DestinationInput
@@ -144,7 +147,7 @@ const SearchBar = () => {
           )}
 
           <div className="hidden lg:flex justify-center items-center bg-violet-100 rounded-4xl p-4">
-            <img src="/src/assets/date.png" alt="" width={150} />
+            <img src={dateImg} alt="" width={150} />
           </div>
           {isMobile ? (
             step === 1 && <DateInput range={range} setRange={setRange} />
@@ -153,7 +156,7 @@ const SearchBar = () => {
           )}
 
           <div className="hidden lg:flex justify-center items-center bg-green-100 rounded-4xl p-4">
-            <img src="/src/assets/dollar.png" width={150} />
+            <img src={dollar} width={150} />
           </div>
           {isMobile ? (
             step === 2 && <BudgetInput budget={budget} onChange={setBudget} />

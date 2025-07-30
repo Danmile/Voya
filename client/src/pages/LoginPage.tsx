@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
 import { useState } from "react";
+import landscapeImg from "../assets/landscape.jpg";
 
 const LoginPage = () => {
   const { login } = useAuthStore();
@@ -77,7 +78,7 @@ const LoginPage = () => {
       <div className="relative bg-white w-1/2 overflow-hidden">
         <img
           className="absolute w-full h-full object-cover opacity-70"
-          src="/src/assets/landscape.jpg"
+          src={landscapeImg}
           alt=""
         />
         <div className="hidden w-full h-full lg:flex flex-col items-center justify-between z-1 mt-50">

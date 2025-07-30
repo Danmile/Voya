@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useAttractionStore } from "../store/useAttractionStore";
 import type { Attraction } from "../store/useAttractionStore";
+import bookmarkImg from "../assets/bookmark.png";
 
 interface AttractionGridProps {
   cityName?: string;
@@ -47,11 +48,7 @@ const AttractionGrid = ({ cityName }: AttractionGridProps) => {
                   !bookmark ? "bg-gray-500/70 hover:bg-black" : "p-2 bg-black"
                 }`}
               >
-                <img
-                  src="/src/assets/bookmark.png"
-                  className="opacity-80"
-                  alt="bookMark"
-                />
+                <img src={bookmarkImg} className="opacity-80" alt="bookMark" />
               </button>
             </div>
             <img

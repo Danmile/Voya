@@ -1,4 +1,5 @@
 import SearchBar from "./SearchBar";
+import heroImg from "../assets/heroCover.jpg";
 
 const HeroComponent = () => {
   return (
@@ -6,7 +7,7 @@ const HeroComponent = () => {
       {/* background img */}
       <div className="absolute top-0 right-0 w-full h-full bg-black/70 z-0">
         <img
-          src="/src/assets/heroCover.jpg"
+          src={heroImg}
           className="w-full h-full object-cover opacity-50"
           alt="HeroImage"
         />
