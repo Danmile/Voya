@@ -21,7 +21,7 @@ const CustomInput = React.forwardRef<HTMLInputElement, any>(
 CustomInput.displayName = "CustomInput";
 
 const DateInput = ({ range, setRange }: DateInputProps) => (
-  <div className="flex flex-col w-full p-3">
+  <div className="flex flex-col w-full justify-center">
     <h1 className="hidden lg:block mb-1">Date</h1>
     <DatePicker
       selectsRange

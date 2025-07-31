@@ -11,6 +11,7 @@ import { toast } from "react-hot-toast";
 import pin from "../assets/pin.png";
 import dollar from "../assets/dollar.png";
 import dateImg from "../assets/date.png";
+import { ArrowLeft } from "lucide-react";
 
 const SearchBar = () => {
   const [destination, setDestination] = useState("");
@@ -136,6 +137,18 @@ const SearchBar = () => {
           <div className="hidden lg:flex justify-center items-center bg-blue-100 rounded-4xl p-4">
             <img src={pin} alt="" width={150} />
           </div>
+          {step > 0 && (
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                setStep(step - 1);
+              }}
+              className="p-2 border-1 border-gray-400 rounded-2xl"
+            >
+              <ArrowLeft />
+            </button>
+          )}
+
           {step === 0 && (
             <DestinationInput
               destination={destination}
