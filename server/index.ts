@@ -27,7 +27,6 @@ app.use(
         callback(null, true);
       } else {
         callback(new Error("Not allowed by CORS"));
-        console.error("CORS blocked for origin:", origin);
       }
     },
     credentials: true, // if you use cookies or auth headers
