@@ -16,3 +16,9 @@
 body {
   overscroll-behavior: none;
 }
+
+.react-datepicker__close-icon {
+  top: -1rem !important; /* move above the input */
+  left: 4.8rem !important; /* adjust horizontal if needed */
+  position: absolute !important;
+}

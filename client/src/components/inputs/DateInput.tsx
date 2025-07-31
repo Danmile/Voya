@@ -23,14 +23,17 @@ CustomInput.displayName = "CustomInput";
 const DateInput = ({ range, setRange }: DateInputProps) => (
   <div className="flex flex-col w-full justify-center">
     <h1 className="hidden lg:block mb-1">Date</h1>
-    <DatePicker
-      selectsRange
-      startDate={range[0]}
-      endDate={range[1]}
-      onChange={(update) => setRange(update as [Date | null, Date | null])}
-      isClearable
-      customInput={<CustomInput />}
-    />
+    <div className="relative">
+      <DatePicker
+        selectsRange
+        startDate={range[0]}
+        endDate={range[1]}
+        onChange={(update) => setRange(update as [Date | null, Date | null])}
+        isClearable
+        customInput={<CustomInput />}
+        className="w-full border px-3 py-4 text-xs"
+      />
+    </div>
   </div>
 );
 
