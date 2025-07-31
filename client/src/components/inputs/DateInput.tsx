@@ -13,7 +13,7 @@ const CustomInput = React.forwardRef<HTMLInputElement, any>(
       ref={ref}
       value={value}
       onClick={onClick} // opens calendar on click
-      className="text-sm rounded w-full focus:outline-none focus:ring-0 cursor-pointer"
+      className="text-xs rounded w-full focus:outline-none focus:ring-0 cursor-pointer mr-1 mx-3 md:mx-0 md:text-sm"
       placeholder="Select a date range"
     />
   )
@@ -31,7 +31,6 @@ const DateInput = ({ range, setRange }: DateInputProps) => (
         onChange={(update) => setRange(update as [Date | null, Date | null])}
         isClearable
         customInput={<CustomInput />}
-        className="w-full border px-3 py-4 text-xs"
       />
     </div>
   </div>
