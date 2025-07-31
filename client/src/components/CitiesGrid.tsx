@@ -29,6 +29,20 @@ const CityGrid = ({ countryCode }: CityGridProps) => {
     </div>
   );
 
+  const trimTextToFullSentence = (
+    text: string,
+    maxChars: number = 700
+  ): string => {
+    const trimmed = text.slice(0, maxChars);
+    const lastPeriod = trimmed.lastIndexOf(".");
+    const lastExclamation = trimmed.lastIndexOf("!");
+    const lastQuestion = trimmed.lastIndexOf("?");
+
+    const lastEnd = Math.max(lastPeriod, lastExclamation, lastQuestion);
+
+    return lastEnd !== -1 ? trimmed.slice(0, lastEnd + 1) : trimmed + "...";
+  };
+
   // While loading
   if (!cities) {
     return (
@@ -73,7 +87,7 @@ const CityGrid = ({ countryCode }: CityGridProps) => {
       ))}
       {selectedCity && (
         <div className="fixed inset-0 z-50 bg-opacity-70 bg-gray-300/50 flex items-center justify-center">
-          <div className="bg-white rounded-2xl p-8 max-w-lg w-full relative transition-all duration-300 ease-out">
+          <div className="bg-white rounded-2xl p-8 max-w-lg w-full relative transition-transform duration-300 ease-out">
             <h1 className="text-4xl font-bold text-center mb-5">
               {selectedCity.name}
             </h1>
@@ -94,7 +108,11 @@ const CityGrid = ({ countryCode }: CityGridProps) => {
                   "https://img.freepik.com/free-photo/big-city_1127-3102.jpg?semt=ais_hybrid&w=740";
               }}
             />
-            <p className="text-gray-700">{cityDescription}</p>
+            <p className="text-gray-700">
+              {cityDescription
+                ? trimTextToFullSentence(cityDescription, 600)
+                : "No description available."}
+            </p>
           </div>
         </div>
       )}
